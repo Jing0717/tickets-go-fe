@@ -31,7 +31,11 @@ const SignUp = () => {
         setErrorMessage(result.data.message)
       }
     } catch (error) {
-      setErrorMessage(error.message || '註冊失敗，請重新操作一次')
+      if (error instanceof Error) {
+        setErrorMessage(error.message || '註冊失敗，請重新操作一次')
+      } else {
+        setErrorMessage('註冊失敗，請重新操作一次')
+      }
     }
   }
 
