@@ -26,7 +26,7 @@ const SignUp = () => {
       console.log(result)
 
       if (result.data) {
-        setSuccessMessage(`${result.data.data.name}: ${result.data.message}`)
+        setSuccessMessage(`註冊成功： ${result.data.message}`)
       } else {
         setErrorMessage(result.data.message)
       }
