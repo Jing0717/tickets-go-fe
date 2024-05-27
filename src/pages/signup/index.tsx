@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useRegisterUserMutation } from '@/store/authApi'
+import { RootState } from '@/store/store';
+import { setErrorMessage, clearErrorMessage } from '@/store/slices/authSlice';
 
 const SignUp = () => {
   const [name, setName] = useState<string>('')
@@ -7,13 +10,17 @@ const SignUp = () => {
   const [password, setPassword] = useState<string>('')
   const [passwordConfirm, setPasswordConfirm] = useState<string>('')
   const [birthday, setBirthday] = useState<string>('')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  const [registerUser, { isLoading }] = useRegisterUserMutation()
+  const dispatch = useDispatch();
+  const { errorMessage } = useSelector((state: RootState) => state.auth);
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
 
   const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    setSuccessMessage(null)
+    dispatch(clearErrorMessage())
 
     if (password !== passwordConfirm) {
       setErrorMessage('密碼不一致，請重新輸入')
@@ -22,21 +29,23 @@ const SignUp = () => {
     }
 
     try {
-      const result = await registerUser({ name, email, password, passwordConfirm, birthday })
-      console.log(result)
-
-      if (result.data) {
-        setSuccessMessage(`註冊成功： ${result.data.message}`)
-      } else {
-        setErrorMessage(result.data.message)
-      }
+      const result = await registerUser({ name, email, password, passwordConfirm, birthday }).unwrap();
+      console.log('registerUser:', result);
+      setSuccessMessage(`${result.message}`)
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message || '註冊失敗，請重新操作一次')
+      if (isErrorWithData(error)) {
+        dispatch(setErrorMessage(error.data.message || '註冊失敗，請重新操作一次'));
+      } else if (error instanceof Error) {
+        dispatch(setErrorMessage(error.message || '註冊失敗，請重新操作一次'));
       } else {
-        setErrorMessage('註冊失敗，請重新操作一次')
+        dispatch(setErrorMessage('註冊失敗，請重新操作一次'));
       }
     }
+  }
+
+  // 類型守衛，檢查 error 是否具有 data 屬性
+  function isErrorWithData(error: any): error is { data: { message: string } } {
+    return error && typeof error === 'object' && 'data' in error && typeof error.data === 'object' && 'message' in error.data;
   }
 
   if (isLoading) return <div>Loading...</div>
@@ -236,8 +245,8 @@ const SignUp = () => {
         </div>
       </div>
       <div className='pt-4'>
-        <p className='text-red-600'>{errorMessage !== '' && <p>註冊 錯誤訊息: {errorMessage}</p>}</p>
-        <p className='text-green-600'>{successMessage !== '' && <p>註冊 成功訊息: {successMessage}</p>}</p>
+        {errorMessage && <p className='text-red-600'>註冊 錯誤訊息: {errorMessage}</p>}
+        {successMessage && <p className='text-green-600'>註冊 成功訊息: {successMessage}</p>}
       </div>
     </div>
   )
