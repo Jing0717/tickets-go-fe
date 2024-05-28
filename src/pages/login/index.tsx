@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux'
 import { setToken } from '@/store/slices/authSlice'
 import { useRouter } from 'next/router'
 
-// import { toast } from 'react-toastify'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 // import { ActionTypes, State, Action, InputFieldProps, ButtonProps } from '@/types/login'
 
