@@ -1,257 +1,194 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useReducer } from 'react'
 import { useRegisterUserMutation } from '@/store/authApi'
-import { RootState } from '@/store/store';
-import { setErrorMessage, clearErrorMessage } from '@/store/slices/authSlice';
+import { useDispatch } from 'react-redux'
+import { setToken } from '@/store/slices/authSlice'
+import { useRouter } from 'next/router'
 
-const SignUp = () => {
-  const [name, setName] = useState<string>('')
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [passwordConfirm, setPasswordConfirm] = useState<string>('')
-  const [birthday, setBirthday] = useState<string>('')
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-  const dispatch = useDispatch();
-  const { errorMessage } = useSelector((state: RootState) => state.auth);
-  const [registerUser, { isLoading }] = useRegisterUserMutation();
+// import { ActionTypes, State, Action, InputFieldProps, ButtonProps } from '@/types/login'
 
-  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+enum ActionTypes {
+  SET_NAME = 'SET_NAME',
+  SET_EMAIL = 'SET_EMAIL',
+  SET_PASSWORD = 'SET_PASSWORD',
+  SET_CONFIRM_PASSWORD = 'SET_CONFIRM_PASSWORD'
+}
+
+interface State {
+  name: string
+  email: string
+  password: string
+  passwordConfirm: string
+}
+
+interface Action {
+  type: ActionTypes
+  payload: string
+}
+
+interface InputFieldProps {
+  id: string
+  label: string
+  type: string
+  value: string
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+interface ButtonProps {
+  label: string
+  isLoading: boolean
+}
+
+const initialState: State = {
+  name: '',
+  email: '',
+  password: '',
+  passwordConfirm: ''
+}
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case ActionTypes.SET_NAME:
+      return { ...state, name: action.payload }
+    case ActionTypes.SET_EMAIL:
+      return { ...state, email: action.payload }
+    case ActionTypes.SET_PASSWORD:
+      return { ...state, password: action.payload }
+    case ActionTypes.SET_CONFIRM_PASSWORD:
+      return { ...state, passwordConfirm: action.payload }
+    default:
+      return state
+  }
+}
+
+const InputField: React.FC<InputFieldProps> = React.memo(({ id, label, type, value, onChange }) => (
+  <div>
+    <label htmlFor={id} className='block text-sm font-medium text-gray-700'>
+      {label}
+    </label>
+    <input
+      id={id}
+      type={type}
+      className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+      value={value}
+      onChange={onChange}
+      required
+    />
+  </div>
+))
+
+const Button: React.FC<ButtonProps> = ({ label, isLoading }) => (
+  <button
+    type='submit'
+    className={`w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#DC4B4B] hover:bg-[#C24444] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+    disabled={isLoading}
+  >
+    {isLoading ? 'Loading...' : label}
+  </button>
+)
+
+const Signup: React.FC = () => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const [registerUser, { isLoading }] = useRegisterUserMutation()
+  const reduxDispatch = useDispatch()
+  const router = useRouter()
+
+  const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    setSuccessMessage(null)
-    dispatch(clearErrorMessage())
-
-    if (password !== passwordConfirm) {
-      setErrorMessage('密碼不一致，請重新輸入')
-
-      return
-    }
-
     try {
-      const result = await registerUser({ name, email, password, passwordConfirm, birthday }).unwrap();
-      console.log('registerUser:', result);
-      setSuccessMessage(`${result.message}`)
-    } catch (error) {
-      if (isErrorWithData(error)) {
-        dispatch(setErrorMessage(error.data.message || '註冊失敗，請重新操作一次'));
-      } else if (error instanceof Error) {
-        dispatch(setErrorMessage(error.message || '註冊失敗，請重新操作一次'));
+      const result = await registerUser({
+        name: state.name,
+        email: state.email,
+        password: state.password,
+        passwordConfirm: state.passwordConfirm
+      })
+      if (result.data?.data?.accessToken) {
+        reduxDispatch(setToken(result.data.data.accessToken))
+
+        toast.success(result.data.message)
+        router.push('/')
+      } else if (result.error && 'data' in result.error) {
+        const errorData = result.error.data as { message: string }
+        toast.error(errorData.message)
       } else {
-        dispatch(setErrorMessage('註冊失敗，請重新操作一次'));
+        toast.error('系統錯誤，請重新操作一次')
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || 'An error occurred during login')
+      } else {
+        toast.error('An error occurred during login')
       }
     }
   }
 
-  // 類型守衛，檢查 error 是否具有 data 屬性
-  function isErrorWithData(error: any): error is { data: { message: string } } {
-    return error && typeof error === 'object' && 'data' in error && typeof error.data === 'object' && 'message' in error.data;
+  const handleChange = (type: ActionTypes) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type, payload: event.target.value })
   }
 
-  if (isLoading) return <div>Loading...</div>
-
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center bg-gray-100'>
-      <div className='flex flex-col bg-white shadow-md px-4 sm:px-6 md:px-8 lg:px-10 py-8 rounded-3xl w-50 max-w-md'>
-        <div className='font-medium self-center text-xl sm:text-3xl text-gray-800'>加入我們</div>
-        <div className='mt-4 self-center text-xl sm:text-sm text-gray-800'>快來註冊屬於你的帳號吧</div>
+    <div className='flex justify-center items-center min-h-screen bg-[#FFF5E1] w-full overflow-hidden'>
+      <div className='relative flex justify-center items-center w-[700px] h-[700px]'>
+        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[38%_62%_63%_37%/41%_44%_56%_59%] animate-spin1'></i>
+        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin2'></i>
+        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin3'></i>
 
-        <div className='mt-10'>
-          <form action='#' onSubmit={handleRegister}>
-            <div className='flex flex-col mb-5'>
-              <label htmlFor='name' className='mb-1 text-xs tracking-wide text-gray-600'>
-                姓名:
-              </label>
-              <div className='relative'>
-                <div
-                  className='
-              inline-flex
-              items-center
-              justify-center
-              absolute
-              left-0
-              top-0
-              h-full
-              w-10
-              text-gray-400
-            '
-                >
-                  <i className='fas fa-user text-blue-500'></i>
-                </div>
-
-                <input
-                  id='name'
-                  type='name'
-                  name='name'
-                  className='
-              text-sm
-              placeholder-gray-500
-              pl-10
-              pr-4
-              rounded-2xl
-              border border-gray-400
-              w-full
-              py-2
-              focus:outline-none focus:border-blue-400
-            '
-                  placeholder='Enter your name'
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='flex flex-col mb-5'>
-              <label htmlFor='email' className='mb-1 text-xs tracking-wide text-gray-600'>
-                E-Mail:
-              </label>
-              <div className='relative'>
-                <div
-                  className='
-              inline-flex
-              items-center
-              justify-center
-              absolute
-              left-0
-              top-0
-              h-full
-              w-10
-              text-gray-400
-            '
-                >
-                  <i className='fas fa-at text-blue-500'></i>
-                </div>
-
-                <input
-                  id='email'
-                  type='email'
-                  name='email'
-                  className='
-              text-sm
-              placeholder-gray-500
-              pl-10
-              pr-4
-              rounded-2xl
-              border border-gray-400
-              w-full
-              py-2
-              focus:outline-none focus:border-blue-400
-            '
-                  placeholder='Enter your email'
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='flex flex-col mb-6'>
-              <label htmlFor='password' className='mb-1 text-xs sm:text-sm tracking-wide text-gray-600'>
-                密碼:
-              </label>
-              <div className='relative'>
-                <div
-                  className='
-              inline-flex
-              items-center
-              justify-center
-              absolute
-              left-0
-              top-0
-              h-full
-              w-10
-              text-gray-400
-            '
-                >
-                  <span>
-                    <i className='fas fa-lock text-blue-500'></i>
-                  </span>
-                </div>
-
-                <input
-                  id='password'
-                  type='password'
-                  name='password'
-                  className='
-              text-sm
-              placeholder-gray-500
-              pl-10
-              pr-4
-              rounded-2xl
-              border border-gray-400
-              w-full
-              py-2
-              focus:outline-none focus:border-blue-400
-            '
-                  placeholder='Enter your password'
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='flex flex-col mb-6'>
-              <label htmlFor='passwordConfirm' className='mb-1 text-xs tracking-wide text-gray-600'>
-                確認密碼:
-              </label>
-              <div className='relative'>
-                <div className='inline-flex items-center justify-center absolute left-0 top-0 h-full w-10 text-gray-400'>
-                  <i className='fas fa-lock text-blue-500'></i>
-                </div>
-                <input
-                  id='passwordConfirm'
-                  type='password'
-                  name='passwordConfirm'
-                  className='text-sm placeholder-gray-500 pl-10 pr-4 rounded-2xl border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400'
-                  placeholder='Confirm your password'
-                  value={passwordConfirm}
-                  onChange={e => setPasswordConfirm(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <div className='flex flex-col mb-5'>
-              <label htmlFor='birthday' className='mb-1 text-xs tracking-wide text-gray-600'>
-                生日:
-              </label>
-              <input
-                id='birthday'
-                type='date'
-                name='birthday'
-                className='text-sm placeholder-gray-500 pl-10 pr-4 rounded-2xl border border-gray-400 w-full py-2 focus:outline-none focus:border-blue-400'
-                value={birthday}
-                onChange={e => setBirthday(e.target.value)}
-                required
-              />
-            </div>
-            <div className='flex w-full'>
-              <button
-                type='submit'
-                className='flex mt-2 items-center justify-center focus:outline-none text-white text-sm sm:text-base bg-blue-500 hover:bg-blue-600 rounded-2xl py-2 w-full transition duration-150 ease-in'
-              >
-                <span className='mr-2 uppercase'>Sign Up</span>
-                <span>
-                  <svg
-                    className='h-6 w-6'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    viewBox='0 0 24 24'
-                  >
-                    <path d='M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z' />
-                  </svg>
-                </span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-      <div className='pt-4'>
-        {errorMessage && <p className='text-red-600'>註冊 錯誤訊息: {errorMessage}</p>}
-        {successMessage && <p className='text-green-600'>註冊 成功訊息: {successMessage}</p>}
+        <form
+          className='absolute flex flex-col items-center justify-center gap-5 w-[300px] h-full'
+          onSubmit={handleSignup}
+        >
+          <h2 className='text-2xl text-gray-800'>註冊</h2>
+          <div className='w-full'>
+            <InputField
+              id='name'
+              type='text'
+              label='姓名'
+              value={state.name}
+              onChange={handleChange(ActionTypes.SET_NAME)}
+            />
+          </div>
+          <div className='w-full'>
+            <InputField
+              id='email'
+              type='email'
+              label='Email'
+              value={state.email}
+              onChange={handleChange(ActionTypes.SET_EMAIL)}
+            />
+          </div>
+          <div className='w-full'>
+            <InputField
+              id='password'
+              type='password'
+              label='密碼'
+              value={state.password}
+              onChange={handleChange(ActionTypes.SET_PASSWORD)}
+            />
+          </div>
+          <div className='w-full'>
+            <InputField
+              id='confirmPassword'
+              type='password'
+              label='確認密碼'
+              value={state.passwordConfirm}
+              onChange={handleChange(ActionTypes.SET_CONFIRM_PASSWORD)}
+            />
+          </div>
+          <div className='w-full'>
+            <Button label='註冊' isLoading={isLoading} />
+          </div>
+          <div className='flex justify-end items-center w-full pl-5'>
+            <button className='text-gray-800' onClick={() => router.push('/login')}>
+              登入
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )
 }
 
-SignUp.propTypes = {}
-
-export default SignUp
+export default Signup

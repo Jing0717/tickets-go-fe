@@ -17,10 +17,7 @@ export const authApi = createApi({
     getUsers: builder.query<any, void>({
       query: () => 'auth/users'
     }),
-    registerUser: builder.mutation<
-      any,
-      { name: string; email: string; password: string; passwordConfirm: string; birthday: string }
-    >({
+    registerUser: builder.mutation<any, { name: string; email: string; password: string; passwordConfirm: string }>({
       query: body => ({
         url: 'auth/register',
         method: 'POST',
