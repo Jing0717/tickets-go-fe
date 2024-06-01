@@ -18,14 +18,18 @@ const config: Config = {
           '100%': { transform: 'rotate(360deg)' }
         },
         spin2: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(-360deg)' }
+        },
+        spin3: {
           '0%': { transform: 'rotate(360deg)' },
           '100%': { transform: 'rotate(0deg)' }
         }
       },
       animation: {
-        spin1: 'spin1 6s linear infinite',
-        spin2: 'spin2 4s linear infinite',
-        spin3: 'spin2 10s linear infinite'
+        spin1: 'spin1 10s linear infinite',
+        spin2: 'spin2 7s linear infinite',
+        spin3: 'spin3 5s linear infinite'
       }
     }
   },
