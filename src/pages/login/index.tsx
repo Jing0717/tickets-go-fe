@@ -55,7 +55,7 @@ const reducer = (state: State, action: Action): State => {
 
 const InputField: React.FC<InputFieldProps> = React.memo(({ id, label, type, value, onChange }) => (
   <div>
-    <label htmlFor={id} className='block text-sm font-medium text-white'>
+    <label htmlFor={id} className='block text-sm font-medium text-gray-700'>
       {label}
     </label>
     <input
@@ -72,7 +72,7 @@ const InputField: React.FC<InputFieldProps> = React.memo(({ id, label, type, val
 const Button: React.FC<ButtonProps> = ({ label, isLoading }) => (
   <button
     type='submit'
-    className={`w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+    className={`w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#DC4B4B] hover:bg-[#C24444] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
     disabled={isLoading}
   >
     {isLoading ? 'Loading...' : label}
@@ -92,16 +92,19 @@ const Login: React.FC = () => {
       if (result.data?.data?.accessToken) {
         reduxDispatch(setToken(result.data.data.accessToken))
 
-        // toast.success(result.data.data.message)
+        toast.success(result.data.data.message)
         router.push('/')
+      } else if (result.error && 'data' in result.error) {
+        const errorData = result.error.data as { message: string }
+        toast.error(errorData.message)
       } else {
-        // toast.error(result.error?.data?.message)
+        toast.error('系統錯誤，請重新操作一次')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
-        // toast.error(error.message || 'An error occurred during login')
+        toast.error(error.message || '系統錯誤，請重新操作一次')
       } else {
-        toast.error('An error occurred during login')
+        toast.error('系統錯誤，請重新操作一次')
       }
     }
   }
@@ -111,17 +114,17 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className='flex justify-center items-center min-h-screen bg-[#111] w-full overflow-hidden'>
-      <div className='relative flex justify-center items-center w-[500px] h-[500px]'>
-        <i className='absolute inset-0 border-2 border-white rounded-[38%_62%_63%_37%/41%_44%_56%_59%] animate-spin1'></i>
-        <i className='absolute inset-0 border-2 border-white rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin2'></i>
-        <i className='absolute inset-0 border-2 border-white rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin3'></i>
+    <div className='flex justify-center items-center min-h-screen bg-[#FFF5E1] w-full overflow-hidden'>
+      <div className='relative flex justify-center items-center w-[700px] h-[700px]'>
+        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[38%_62%_63%_37%/41%_44%_56%_59%] animate-spin1'></i>
+        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin2'></i>
+        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin3'></i>
 
         <form
           className='absolute flex flex-col items-center justify-center gap-5 w-[300px] h-full'
           onSubmit={handleLogin}
         >
-          <h2 className='text-2xl text-white'>登入</h2>
+          <h2 className='text-2xl text-gray-800'>登入</h2>
           <div className='w-full'>
             <InputField
               id='email'
@@ -140,14 +143,16 @@ const Login: React.FC = () => {
               onChange={handleChange(ActionTypes.SET_PASSWORD)}
             />
           </div>
-          <div className='flex justify-end items-center w-full px-5'>
-            <button className='text-white'>忘記密碼</button>
+          <div className='flex justify-end items-center w-full pl-5'>
+            <button className='text-gray-700'>忘記密碼</button>
           </div>
           <div className='w-full'>
             <Button label='登入' isLoading={isLoading} />
           </div>
-          <div className='flex justify-end items-center w-full px-5'>
-            <button className='text-white'>註冊</button>
+          <div className='flex justify-end items-center w-full pl-5'>
+            <button className='text-gray-800' onClick={() => router.push('/signup')}>
+              註冊
+            </button>
           </div>
         </form>
       </div>
