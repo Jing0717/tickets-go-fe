@@ -36,8 +36,20 @@ export const authApi = createApi({
         url: 'auth/logout',
         method: 'POST'
       })
+    }),
+    handleGoogle: builder.mutation<any, void>({
+      query: () => ({
+        url: 'auth/google',
+        method: 'POST'
+      })
     })
   })
 })
 
-export const { useGetUsersQuery, useRegisterUserMutation, useLoginUserMutation, useLogoutUserMutation } = authApi
+export const {
+  useGetUsersQuery,
+  useRegisterUserMutation,
+  useLoginUserMutation,
+  useLogoutUserMutation,
+  useHandleGoogleMutation
+} = authApi
