@@ -1,8 +1,9 @@
 import React, { useReducer } from 'react'
-import { useRegisterUserMutation } from '@/store/authApi'
+import { useRegisterUserMutation, useHandleGoogleMutation } from '@/store/authApi'
 import { useDispatch } from 'react-redux'
 import { setToken } from '@/store/slices/authSlice'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -92,6 +93,7 @@ const Button: React.FC<ButtonProps> = ({ label, isLoading }) => (
 const Signup: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [registerUser, { isLoading }] = useRegisterUserMutation()
+  const [handleGoogle] = useHandleGoogleMutation()
   const reduxDispatch = useDispatch()
   const router = useRouter()
 
@@ -129,65 +131,112 @@ const Signup: React.FC = () => {
     dispatch({ type, payload: event.target.value })
   }
 
-  return (
-    <div className='flex justify-center items-center min-h-screen bg-[#FFF5E1] w-full overflow-hidden'>
-      <div className='relative flex justify-center items-center w-[700px] h-[700px]'>
-        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[38%_62%_63%_37%/41%_44%_56%_59%] animate-spin1'></i>
-        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin2'></i>
-        <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin3'></i>
+  const handleGoogleRegister = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    try {
+      await handleGoogle().unwrap()
+      router.push('/google/callback')
+    } catch (error) {
+      toast.error('Google 註冊失敗，請重新操作一次')
+    }
+  }
 
-        <form
-          className='absolute flex flex-col items-center justify-center gap-5 w-[300px] h-full'
-          onSubmit={handleSignup}
-        >
-          <h2 className='text-2xl text-gray-800'>註冊</h2>
-          <div className='w-full'>
-            <InputField
-              id='name'
-              type='text'
-              label='姓名'
-              value={state.name}
-              onChange={handleChange(ActionTypes.SET_NAME)}
-            />
+  return (
+    <>
+      <Head>
+        <title>TicketGo - 註冊</title>
+      </Head>
+      <div className='flex justify-center items-center min-h-screen bg-[#FFF5E1] w-full overflow-hidden'>
+        <div className='relative flex justify-center items-center w-[800px] h-[800px]'>
+          <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[38%_62%_63%_37%/41%_44%_56%_59%] animate-spin1 z-10'></i>
+          <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin2 z-10'></i>
+          <i className='absolute inset-0 border-2 border-[#4A4A4A] rounded-[41%_44%_56%_59%/38%_62%_63%_37%] animate-spin3 z-10'></i>
+
+          <div className='relative z-20 flex flex-col items-center justify-center gap-5 w-[300px] h-full'>
+            <h2 className='text-2xl text-gray-800'>註冊</h2>
+            <p>歡迎使用 TicketGo ，隨時隨地輕鬆購票！</p>
+            <div className='w-full mt-4'>
+              <div className='w-full mb-2 lg:mb-0'>
+                <button
+                  type='button'
+                  className='w-full flex justify-center items-center gap-2 bg-white text-sm text-gray-600 p-2 rounded-md hover:bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors duration-300'
+                  onClick={handleGoogleRegister}
+                >
+                  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' className='w-4' id='google'>
+                    <path
+                      fill='#fbbb00'
+                      d='M113.47 309.408 95.648 375.94l-65.139 1.378C11.042 341.211 0 299.9 0 256c0-42.451 10.324-82.483 28.624-117.732h.014L86.63 148.9l25.404 57.644c-5.317 15.501-8.215 32.141-8.215 49.456.002 18.792 3.406 36.797 9.651 53.408z'
+                    ></path>
+                    <path
+                      fill='#518ef8'
+                      d='M507.527 208.176C510.467 223.662 512 239.655 512 256c0 18.328-1.927 36.206-5.598 53.451-12.462 58.683-45.025 109.925-90.134 146.187l-.014-.014-73.044-3.727-10.338-64.535c29.932-17.554 53.324-45.025 65.646-77.911h-136.89V208.176h245.899z'
+                    ></path>
+                    <path
+                      fill='#28b446'
+                      d='m416.253 455.624.014.014C372.396 490.901 316.666 512 256 512c-97.491 0-182.252-54.491-225.491-134.681l82.961-67.91c21.619 57.698 77.278 98.771 142.53 98.771 28.047 0 54.323-7.582 76.87-20.818l83.383 68.262z'
+                    ></path>
+                    <path
+                      fill='#f14336'
+                      d='m419.404 58.936-82.933 67.896C313.136 112.246 285.552 103.82 256 103.82c-66.729 0-123.429 42.957-143.965 102.724l-83.397-68.276h-.014C71.23 56.123 157.06 0 256 0c62.115 0 119.068 22.126 163.404 58.936z'
+                    ></path>
+                  </svg>
+                  Register with Google
+                </button>
+              </div>
+            </div>
+            <p>或</p>
+
+            <form className='flex flex-col items-center justify-center gap-5 w-[300px]' onSubmit={handleSignup}>
+              <div className='w-full'>
+                <InputField
+                  id='name'
+                  type='text'
+                  label='姓名'
+                  value={state.name}
+                  onChange={handleChange(ActionTypes.SET_NAME)}
+                />
+              </div>
+              <div className='w-full'>
+                <InputField
+                  id='email'
+                  type='email'
+                  label='Email'
+                  value={state.email}
+                  onChange={handleChange(ActionTypes.SET_EMAIL)}
+                />
+              </div>
+              <div className='w-full'>
+                <InputField
+                  id='password'
+                  type='password'
+                  label='密碼'
+                  value={state.password}
+                  onChange={handleChange(ActionTypes.SET_PASSWORD)}
+                />
+              </div>
+              <div className='w-full'>
+                <InputField
+                  id='confirmPassword'
+                  type='password'
+                  label='確認密碼'
+                  value={state.passwordConfirm}
+                  onChange={handleChange(ActionTypes.SET_CONFIRM_PASSWORD)}
+                />
+              </div>
+              <div className='w-full'>
+                <Button label='註冊' isLoading={isLoading} />
+              </div>
+            </form>
+            <p>
+              <span>已經有帳號了嗎？</span>
+              <button className='text-gray-800' onClick={() => router.push('/login')}>
+                前往登入
+              </button>
+            </p>
           </div>
-          <div className='w-full'>
-            <InputField
-              id='email'
-              type='email'
-              label='Email'
-              value={state.email}
-              onChange={handleChange(ActionTypes.SET_EMAIL)}
-            />
-          </div>
-          <div className='w-full'>
-            <InputField
-              id='password'
-              type='password'
-              label='密碼'
-              value={state.password}
-              onChange={handleChange(ActionTypes.SET_PASSWORD)}
-            />
-          </div>
-          <div className='w-full'>
-            <InputField
-              id='confirmPassword'
-              type='password'
-              label='確認密碼'
-              value={state.passwordConfirm}
-              onChange={handleChange(ActionTypes.SET_CONFIRM_PASSWORD)}
-            />
-          </div>
-          <div className='w-full'>
-            <Button label='註冊' isLoading={isLoading} />
-          </div>
-          <div className='flex justify-end items-center w-full pl-5'>
-            <button className='text-gray-800' onClick={() => router.push('/login')}>
-              登入
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
