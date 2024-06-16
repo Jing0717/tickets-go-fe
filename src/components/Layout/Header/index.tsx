@@ -4,9 +4,8 @@ import Search from './Search'
 import Notification from './Notification'
 import UserProfile from './UserProfile'
 
-type Props = {}
 
-const Header = (props: Props) => {
+const Header = () => {
   return (
     <div className='h-[80px] bg-background flex items-center'>
       <div className="container">
