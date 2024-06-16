@@ -8,28 +8,19 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
-      },
-      keyframes: {
-        spin1: {
-          '0%': { transform: 'rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg)' }
-        },
-        spin2: {
-          '0%': { transform: 'rotate(0deg)' },
-          '100%': { transform: 'rotate(-360deg)' }
-        },
-        spin3: {
-          '0%': { transform: 'rotate(360deg)' },
-          '100%': { transform: 'rotate(0deg)' }
+      container: {
+        center: true,
+        padding: '12px',
+        screens: {
+          md: '100%',
+          lg: '1296px'
         }
       },
-      animation: {
-        spin1: 'spin1 10s linear infinite',
-        spin2: 'spin2 7s linear infinite',
-        spin3: 'spin3 5s linear infinite'
+      colors: {
+        background: '#FFFBF5'
+      },
+      fontFamily: {
+        'noto-sans-tc': ['Noto Sans TC', 'sans-serif']
       }
     }
   },
