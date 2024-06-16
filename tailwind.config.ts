@@ -17,13 +17,21 @@ const config: Config = {
         }
       },
       colors: {
-        background: '#FFFBF5'
+        background: '#FFFBF5',
+        'gray-01': '#1E1E1E',
+        'gray-02': '#4A4A4A',
+        'gray-03': '#C6C6C6',
+        'gray-04': '#F4F4F4'
       },
       fontFamily: {
         'noto-sans-tc': ['Noto Sans TC', 'sans-serif']
+      },
+      borderWidth: {
+        '1': '1px'
       }
     }
   },
   plugins: []
 }
+
 export default config
