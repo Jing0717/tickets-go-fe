@@ -250,9 +250,9 @@ const Login: React.FC = () => {
             </form>
             <p>
               <span>還沒有帳號嗎？</span>
-              <span className='text-gray-800' onClick={() => router.push('/signup')}>
+              <button className='text-gray-800' onClick={() => router.push('/signup')}>
                 前往註冊
-              </span>
+              </button>
             </p>
           </div>
         </div>
