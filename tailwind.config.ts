@@ -28,6 +28,29 @@ const config: Config = {
       },
       borderWidth: {
         '1': '1px'
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
+      },
+      keyframes: {
+        spin1: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' }
+        },
+        spin2: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(-360deg)' }
+        },
+        spin3: {
+          '0%': { transform: 'rotate(360deg)' },
+          '100%': { transform: 'rotate(0deg)' }
+        }
+      },
+      animation: {
+        spin1: 'spin1 10s linear infinite',
+        spin2: 'spin2 7s linear infinite',
+        spin3: 'spin3 5s linear infinite'
       }
     }
   },
