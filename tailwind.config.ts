@@ -18,6 +18,8 @@ const config: Config = {
       },
       colors: {
         background: '#FFFBF5',
+        'brand-01': '#DC4B4A',
+        'brand-02': '#FFFBF5',
         'gray-01': '#1E1E1E',
         'gray-02': '#4A4A4A',
         'gray-03': '#C6C6C6',
@@ -28,6 +30,30 @@ const config: Config = {
       },
       borderWidth: {
         '1': '1px'
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-hero': 'linear-gradient(180deg, #FFFBF5 0%, rgba(255, 251, 245, 0) 100%)'
+      },
+      keyframes: {
+        spin1: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' }
+        },
+        spin2: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(-360deg)' }
+        },
+        spin3: {
+          '0%': { transform: 'rotate(360deg)' },
+          '100%': { transform: 'rotate(0deg)' }
+        }
+      },
+      animation: {
+        spin1: 'spin1 10s linear infinite',
+        spin2: 'spin2 7s linear infinite',
+        spin3: 'spin3 5s linear infinite'
       }
     }
   },

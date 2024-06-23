@@ -100,7 +100,7 @@ const ForgotPasswordModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
   }
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-30'>
+    <div className='fixed inset-0 flex items-center justify-center bg-opacity-50 z-30  bg-background'>
       <div className='bg-white p-6 rounded-md shadow-md w-[300px]'>
         <div className='flex justify-between items-center mb-4'>
           <h2 className='text-xl'>重設密碼</h2>
@@ -250,9 +250,9 @@ const Login: React.FC = () => {
             </form>
             <p>
               <span>還沒有帳號嗎？</span>
-              <span className='text-gray-800' onClick={() => router.push('/signup')}>
+              <button className='text-gray-800' onClick={() => router.push('/signup')}>
                 前往註冊
-              </span>
+              </button>
             </p>
           </div>
         </div>
