@@ -18,6 +18,8 @@ const config: Config = {
       },
       colors: {
         background: '#FFFBF5',
+        'brand-01': '#DC4B4A',
+        'brand-02': '#FFFBF5',
         'gray-01': '#1E1E1E',
         'gray-02': '#4A4A4A',
         'gray-03': '#C6C6C6',
@@ -31,7 +33,8 @@ const config: Config = {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-hero': 'linear-gradient(180deg, #FFFBF5 0%, rgba(255, 251, 245, 0) 100%)'
       },
       keyframes: {
         spin1: {

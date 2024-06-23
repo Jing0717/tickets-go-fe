@@ -46,7 +46,7 @@ const Footer = () => {
           <p className="text-gray-03">Copyright © 2024 北六組 All Rights Reserved</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Image src="/fb.svg" alt="Logo" width={24} height={24} priority />
-            <Image src="/x.svg" alt="Logo" width={24} height={24} priority />
+            <Image src="/X.svg" alt="Logo" width={24} height={24} priority />
           </div>
         </div>
       </div>
