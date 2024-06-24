@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faEnvelope, faFaceMehBlank } from '@fortawesome/free-regular-svg-icons'
+import { useUpdateUserMutation } from '@/store/authApi'
+
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const User: React.FC = () => {
   const [gender, setGender] = useState<string | null>(null)
@@ -10,6 +14,22 @@ const User: React.FC = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isFormValid, setIsFormValid] = useState(false)
+  const [userId, setUserId] = useState('')
+
+  const [updateUser] = useUpdateUserMutation()
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user')
+      if (userData) {
+        const user = JSON.parse(userData)
+        setName(user.name)
+        setAccount(user.email)
+        setGender(user.gender)
+        setUserId(user.id)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const isFormFilled = !!(name && account && password && confirmPassword && password === confirmPassword)
@@ -20,9 +40,25 @@ const User: React.FC = () => {
     setGender(selectedGender)
   }
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     if (isFormValid) {
       console.log('驗證結果:', { name, account, password, confirmPassword, gender })
+
+      try {
+        const result = await updateUser({
+          id: userId,
+          name,
+          account,
+          password,
+          confirmPassword,
+          gender
+        }).unwrap()
+        console.log('更新成功:', result)
+
+        toast.success(result.data.data.message)
+      } catch (err) {
+        console.error('更新失敗:', err)
+      }
 
       setPassword('')
       setConfirmPassword('')
