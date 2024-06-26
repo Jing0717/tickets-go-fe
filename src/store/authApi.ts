@@ -61,6 +61,11 @@ export const authApi = createApi({
       query: () => ({
         url: 'user/all'
       })
+    }),
+    getUserOrders: builder.mutation<any, { id: string; status: string | null }>({
+      query: ({ id, status }) => ({
+        url: `user/${id}${status ? `/${status}` : ''}`
+      })
     })
   })
 })
@@ -72,5 +77,6 @@ export const {
   useHandleGoogleMutation,
   useGetUserMutation,
   useGetUsersMutation,
-  useUpdateUserMutation
+  useUpdateUserMutation,
+  useGetUserOrdersMutation
 } = authApi
