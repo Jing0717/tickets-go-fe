@@ -50,7 +50,21 @@ const UserOrders: React.FC = () => {
 
       // TODO: 串接 api
       setTimeout(() => {
-        setOrders([])
+        const fakeOrder = {
+          id: 1,
+          eventRange: {
+            startDate: Date.now() - 86400000,
+            endDate: Date.now() + 86400000
+          },
+          name: '假訂單',
+          content: '這是一個假訂單的內容描述。',
+          status: filter,
+          bannerImage: 'https://via.placeholder.com/250x200',
+          type: ['熱門', '推薦'],
+          ticketStatus: '已付款'
+        }
+
+        setOrders([fakeOrder])
         setLoading(false)
       }, 2000)
     }
@@ -127,11 +141,15 @@ const UserOrders: React.FC = () => {
             </div>
           ) : (
             filteredOrders.map(order => (
-              <div key={order.id} className='flex items-center mb-4 border-b pb-4'>
-                <div className='w-1/5'>
-                  <img src={order.bannerImage} alt={order.name} className='w-[250px] h-[200px] object-cover' />
+              <div key={order.id} className='flex flex-col md:flex-row items-center mb-4 border-b pb-4'>
+                <div className='w-full md:w-1/5'>
+                  <img
+                    src={order.bannerImage}
+                    alt={order.name}
+                    className='w-full md:w-[250px] md:h-[200px] object-cover'
+                  />
                 </div>
-                <div className='flex-1 w-4/5 bg-white p-6'>
+                <div className='flex-1 w-full md:w-4/5 bg-white p-6'>
                   <div className='flex justify-between mb-3'>
                     <div className='flex flex-row'>
                       {order.type.map((type, index) => (
@@ -144,7 +162,6 @@ const UserOrders: React.FC = () => {
                         </div>
                       ))}
                     </div>
-
                     <span
                       className={`bg-[#F5F5F5] text-${order.ticketStatus === '付款失敗' ? '[#DC4B4B]' : 'black'} px-4 py-2`}
                     >
@@ -156,17 +173,21 @@ const UserOrders: React.FC = () => {
                       {order.eventRange?.startDate ? formatDate(order.eventRange.startDate) : ''}
                     </span>
                   </div>
-                  <div className='flex justify-between'>
-                    <div className='w-1/3'>
+                  <div className='flex flex-col md:flex-row  justify-between'>
+                    <div className='w-full mb-3 md:w-1/3 md:mb-0'>
                       <h2 className='text-xl text-[#1E1E1E] font-medium mb-3'>{order.name}</h2>
                       <p className='overflow-hidden truncate'>{order.content}</p>
                     </div>
-                    <div className='w-2/3 flex justify-end items-center'>
-                      <button className='bg-white text-black border-2 border-black p-2 w-28 h-11 mr-4'>查看活動</button>
+                    <div className='w-full md:w-2/3 flex justify-center md:justify-end items-center'>
+                      <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11 mr-4'>
+                        查看活動
+                      </button>
                       {order.ticketStatus === '付款失敗' ? (
-                        <button className='bg-[#DC4B4B] text-white px-4 py-2 w-28 h-11'>付款失敗</button>
+                        <button className='bg-[#DC4B4B] text-white px-4 py-2 w-full md:w-28 h-11'>付款失敗</button>
                       ) : (
-                        <button className='bg-white text-black border-2 border-black p-2 w-28 h-11'>票券資訊</button>
+                        <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11'>
+                          票券資訊
+                        </button>
                       )}
                     </div>
                   </div>
