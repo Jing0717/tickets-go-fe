@@ -64,7 +64,12 @@ export const authApi = createApi({
     }),
     getUserOrders: builder.mutation<any, { id: string; status: string | null }>({
       query: ({ id, status }) => ({
-        url: `user/${id}${status ? `/${status}` : ''}`
+        url: `user/order/${id}${status ? `/${status}` : ''}`
+      })
+    }),
+    getUserTrackingList: builder.mutation<any, { id: string; status: string | null }>({
+      query: ({ id, status }) => ({
+        url: `user/tracking/${id}${status ? `/${status}` : ''}`
       })
     })
   })
@@ -78,5 +83,6 @@ export const {
   useGetUserMutation,
   useGetUsersMutation,
   useUpdateUserMutation,
-  useGetUserOrdersMutation
+  useGetUserOrdersMutation,
+  useGetUserTrackingListMutation
 } = authApi
