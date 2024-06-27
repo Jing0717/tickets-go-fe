@@ -62,9 +62,9 @@ export const authApi = createApi({
         url: 'user/all'
       })
     }),
-    getUserOrders: builder.mutation<any, { id: string; status: string | null }>({
-      query: ({ id, status }) => ({
-        url: `user/order/${id}${status ? `/${status}` : ''}`
+    getUserOrders: builder.mutation<any, { status: string | null }>({
+      query: ({ status }) => ({
+        url: `user/orders${status ? `?status=${status}` : ''}`
       })
     }),
     getUserTrackingList: builder.mutation<any, { id: string; status: string | null }>({

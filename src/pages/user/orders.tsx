@@ -3,34 +3,47 @@ import Layout from '@/components/Layout'
 import { useGetUserOrdersMutation } from '@/store/authApi'
 import CustomDatePicker from '@/components/CustomDatePicker'
 import Spinner from '@/components/Spinner'
-import { formatDate } from '@/utils/dateUtils'
+
+// import { formatDate } from '@/utils/dateUtils'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFire, faThumbsUp, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 interface Order {
-  id: number
-  eventRange: {
-    startDate: number
-    endDate: number
-  }
-  name: string
-  content: string
-  status: 'comming' | 'completed'
+  id: string
+  ticketName: string
+  ticketCount: number
+  userId: string
+  eventId: string
+  sessinId: string
+  orderStatus: string
+}
+
+interface Event {
+  id: string
+  eventName: string
+  eventContent: string
+  tags: string[]
+  eventStartDate: string
+  eventEndDate: string
+  introImage: string
   bannerImage: string
-  type: string[]
-  ticketStatus: string
+}
+
+interface OrderWithEvent {
+  order: Order
+  event: Event | null
 }
 
 const UserOrders: React.FC = () => {
   const [getUserOrders] = useGetUserOrdersMutation()
 
-  // comming: 即將到來; completed: 已結束
-  const [filter, setFilter] = useState<'comming' | 'completed'>('comming')
+  // upcoming: 即將到來; finished: 已結束
+  const [filter, setFilter] = useState<'upcoming' | 'finished'>('upcoming')
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<OrderWithEvent[]>([])
 
   const iconMap: { [key: string]: IconDefinition } = {
     熱門: faFire,
@@ -40,37 +53,25 @@ const UserOrders: React.FC = () => {
   const defaultIcon = faFire
 
   useEffect(() => {
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      const user = JSON.parse(userData)
-
-      const res = getUserOrders({ id: user.id, status: filter })
-      console.log(res)
+    const fetchData = async () => {
       setLoading(true)
 
-      // TODO: 串接 api
-      setTimeout(() => {
-        const fakeOrder = {
-          id: 1,
-          eventRange: {
-            startDate: Date.now() - 86400000,
-            endDate: Date.now() + 86400000
-          },
-          name: '假訂單',
-          content: '這是一個假訂單的內容描述。',
-          status: filter,
-          bannerImage: 'https://via.placeholder.com/250x200',
-          type: ['熱門', '推薦'],
-          ticketStatus: '已付款'
+      try {
+        const res: any = await getUserOrders({ status: filter }).unwrap()
+        if (res && res.status && res.data) {
+          setOrders(res.data)
+        } else {
+          setOrders([])
         }
-
-        setOrders([fakeOrder])
+      } catch (error) {
+        setOrders([])
+      } finally {
         setLoading(false)
-      }, 2000)
+      }
     }
-  }, [filter, getUserOrders])
 
-  const filteredOrders = orders.filter(order => order.status === filter)
+    fetchData()
+  }, [filter, getUserOrders])
 
   return (
     <Layout>
@@ -81,17 +82,17 @@ const UserOrders: React.FC = () => {
             <div className='flex w-full'>
               <button
                 className={`border w-1/2 md:w-auto py-3 px-7 transition duration-300 transform ${
-                  filter === 'comming' ? 'border-[#DC4B4B] text-[#DC4B4B] scale-105' : 'border-transparent text-black'
+                  filter === 'upcoming' ? 'border-[#DC4B4B] text-[#DC4B4B] scale-105' : 'border-transparent text-black'
                 }`}
-                onClick={() => setFilter('comming')}
+                onClick={() => setFilter('upcoming')}
               >
                 即將到來
               </button>
               <button
                 className={`border w-1/2 md:w-auto py-3 px-7 transition duration-300 transform ${
-                  filter === 'completed' ? 'border-[#DC4B4B] text-[#DC4B4B] scale-105' : 'border-transparent text-black'
+                  filter === 'finished' ? 'border-[#DC4B4B] text-[#DC4B4B] scale-105' : 'border-transparent text-black'
                 }`}
-                onClick={() => setFilter('completed')}
+                onClick={() => setFilter('finished')}
               >
                 已結束
               </button>
@@ -134,58 +135,59 @@ const UserOrders: React.FC = () => {
           </div>
           {loading ? (
             <Spinner />
-          ) : filteredOrders.length === 0 ? (
+          ) : orders.length === 0 ? (
             <div className='flex flex-col items-center justify-center flex-grow'>
               {/* <p className='text-[#DC4B4B] text-lg font-bold p-5'>目前尚無訂單</p> */}
               <img src='../noOrder.png' alt='目前尚無訂單' className='w-80 h-100' />
             </div>
           ) : (
-            filteredOrders.map(order => (
+            orders.map(({ order, event }) => (
               <div key={order.id} className='flex flex-col md:flex-row items-center mb-4 border-b pb-4'>
                 <div className='w-full md:w-1/5'>
                   <img
-                    src={order.bannerImage}
-                    alt={order.name}
+                    src={event?.bannerImage}
+                    alt={event?.eventName}
                     className='w-full md:w-[250px] md:h-[200px] object-cover'
                   />
                 </div>
                 <div className='flex-1 w-full md:w-4/5 bg-white p-6'>
                   <div className='flex justify-between mb-3'>
                     <div className='flex flex-row'>
-                      {order.type.map((type, index) => (
+                      {event?.tags.map((tag, index) => (
                         <div
                           key={index}
                           className='bg-[#1E1E1ECC] text-white px-4 py-2 flex flex-row items-center mr-2'
                         >
-                          <FontAwesomeIcon icon={iconMap[type] || defaultIcon} className='w-5 h-5 pr-1.5' />
-                          <span>{type}</span>
+                          <FontAwesomeIcon icon={iconMap[tag] || defaultIcon} className='w-5 h-5 pr-1.5' />
+                          <span>{tag}</span>
                         </div>
                       ))}
                     </div>
                     <span
-                      className={`bg-[#F5F5F5] text-${order.ticketStatus === '付款失敗' ? '[#DC4B4B]' : 'black'} px-4 py-2`}
+                      className={`bg-[#F5F5F5] text-${order?.orderStatus === '2' ? '[#DC4B4B]' : 'black'} px-4 py-2`}
                     >
-                      {order.ticketStatus}
+                      {order.orderStatus === '2' ? '付款失敗' : '已付款'}
                     </span>
                   </div>
                   <div className='flex justify-between mb-3'>
                     <span className='text-[#4A4A4A] text-base tracking-wider'>
-                      {order.eventRange?.startDate ? formatDate(order.eventRange.startDate) : ''}
+                      {event?.eventStartDate}
+                      {/*  ? formatDate(new Date(event.eventStartDate)) : '' */}
                     </span>
                   </div>
                   <div className='flex flex-col md:flex-row  justify-between'>
                     <div className='w-full mb-3 md:w-1/3 md:mb-0'>
-                      <h2 className='text-xl text-[#1E1E1E] font-medium mb-3'>{order.name}</h2>
-                      <p className='overflow-hidden truncate'>{order.content}</p>
+                      <h2 className='text-xl text-[#1E1E1E] font-medium mb-3'>{event?.eventName}</h2>
+                      <p className='overflow-hidden truncate'>{event?.eventContent}</p>
                     </div>
                     <div className='w-full md:w-2/3 flex justify-center md:justify-end items-center'>
-                      <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11 mr-4'>
+                      <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11 mr-4 hover:bg-black hover:text-white transition-colors duration-300'>
                         查看活動
                       </button>
-                      {order.ticketStatus === '付款失敗' ? (
+                      {order.orderStatus === '2' ? (
                         <button className='bg-[#DC4B4B] text-white px-4 py-2 w-full md:w-28 h-11'>付款失敗</button>
                       ) : (
-                        <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11'>
+                        <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11 hover:bg-black hover:text-white transition-colors duration-300'>
                           票券資訊
                         </button>
                       )}
