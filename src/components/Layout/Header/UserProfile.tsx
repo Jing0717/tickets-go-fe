@@ -41,7 +41,7 @@ const UserProfile: React.FC = () => {
           </li>
           <li
             className='hover:bg-[#C6C6C6] hover:text-black text-white py-2 px-4 border-b-[1px] border-white cursor-pointer'
-            onClick={() => handleNavigation('/user/tracking')}
+            onClick={() => handleNavigation('/user/track')}
           >
             追蹤列表
           </li>
