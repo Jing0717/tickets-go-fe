@@ -67,9 +67,9 @@ export const authApi = createApi({
         url: `user/orders${status ? `?status=${status}` : ''}`
       })
     }),
-    getUserTrackingList: builder.mutation<any, { id: string; status: string | null }>({
-      query: ({ id, status }) => ({
-        url: `user/tracking/${id}${status ? `/${status}` : ''}`
+    getUserTrackingList: builder.mutation<any, { status: string }>({
+      query: ({ status }) => ({
+        url: `event/follow?status=${status}`
       })
     })
   })

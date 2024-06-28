@@ -46,7 +46,7 @@ const Footer = () => {
                   </li>
                   <li
                     className='py-2 cursor-pointer hover:text-gray-03'
-                    onClick={() => handleNavigation('/user/tracking')}
+                    onClick={() => handleNavigation('/user/track')}
                   >
                     追蹤列表
                   </li>
