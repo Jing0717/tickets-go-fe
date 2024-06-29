@@ -3,7 +3,6 @@
 // import { useGetUsersQuery } from '../store/authApi';
 // import { clearToken } from '@/store/slices/authSlice';
 // import { useDispatch } from 'react-redux';
-import Layout from '@/components/Layout';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
@@ -35,7 +34,6 @@ export default function Home() {
   // if (isLoading) return <div>Loading...</div>;
 
   return (
-    <Layout>
       <div className="relative pb-8 md:pb-0 w-full min-h-[625px] h-auto md:min-h-[807px] flex items-end md:items-center overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center opacity-20 blur-sm" style={{ backgroundImage: `url('/hero.jpeg')` }}></div>
         <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #FFFBF5 0%, rgba(255, 251, 245, 0) 100%)' }}></div>
@@ -70,6 +68,5 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </Layout>
   );
 }

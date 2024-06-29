@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from '../store/store'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Layout from '@/components/Layout';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -29,7 +30,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           pauseOnHover
           theme='light'
         />
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </Provider>
     </>
   )
