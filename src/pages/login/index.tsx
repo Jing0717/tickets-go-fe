@@ -142,8 +142,15 @@ const Login: React.FC = () => {
     event.preventDefault()
     try {
       const result = await loginUser({ email: state.email, password: state.password })
+      console.log('result:', result)
       if (result.data?.data?.accessToken) {
-        reduxDispatch(setToken(result.data.data.accessToken))
+        const token = result.data.data.accessToken
+        console.log('token:', token)
+        const user = result.data.data.user
+        reduxDispatch(setToken(token))
+
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(user))
 
         toast.success(result.data.data.message)
         router.push('/')

@@ -6,6 +6,8 @@ export const authApi = createApi({
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as any).auth.token
+      console.log('token:', token)
+      console.log('getState:', getState())
       if (token) {
         headers.set('authorization', `Bearer ${token}`)
       }
@@ -14,9 +16,6 @@ export const authApi = createApi({
     }
   }),
   endpoints: builder => ({
-    getUsers: builder.query<any, void>({
-      query: () => 'auth/users'
-    }),
     registerUser: builder.mutation<any, { name: string; email: string; password: string; passwordConfirm: string }>({
       query: body => ({
         url: 'auth/register',
@@ -42,14 +41,48 @@ export const authApi = createApi({
         url: 'auth/google',
         method: 'POST'
       })
+    }),
+    getUser: builder.mutation<any, void>({
+      query: () => ({
+        url: 'user'
+      })
+    }),
+    updateUser: builder.mutation<
+      any,
+      { id: string; name: string; account: string; password: string; confirmPassword: string; gender: string | null }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `user/${id}`,
+        method: 'PUT',
+        body
+      })
+    }),
+    getUsers: builder.mutation<any, void>({
+      query: () => ({
+        url: 'user/all'
+      })
+    }),
+    getUserOrders: builder.mutation<any, { status: string | null }>({
+      query: ({ status }) => ({
+        url: `user/orders${status ? `?status=${status}` : ''}`
+      })
+    }),
+    getUserTrackingList: builder.mutation<any, { status: string }>({
+      query: ({ status }) => ({
+        url: `event/follow?status=${status}`
+      })
     })
   })
 })
 
 export const {
-  useGetUsersQuery,
   useRegisterUserMutation,
   useLoginUserMutation,
   useLogoutUserMutation,
-  useHandleGoogleMutation
+  useHandleGoogleMutation,
+  useGetUserMutation,
+  useGetUsersMutation,
+  useUpdateUserMutation,
+  useGetUserOrdersMutation,
+  useGetUserTrackingListMutation
 } = authApi
