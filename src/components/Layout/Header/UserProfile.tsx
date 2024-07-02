@@ -19,7 +19,7 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className='relative'>
+    <div className='relative z-10'>
       <button className='flex justify-center items-center p-2 space-x-1 hover:cursor-pointer' onClick={toggleDropdown}>
         <FontAwesomeIcon icon={faUser} className='w-6 h-6' />
         <span className='font-noto-sans-tc'>Jacky</span>

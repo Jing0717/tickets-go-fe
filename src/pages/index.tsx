@@ -2,6 +2,7 @@ import Layout from '@/components/Layout'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark } from '@fortawesome/free-regular-svg-icons'
+import { faBookmark as solidfaBookmark } from '@fortawesome/free-solid-svg-icons'
 import Card from '@/components/Card'
 import { useState } from 'react'
 
@@ -77,7 +78,7 @@ export default function Home() {
                 type='button'
                 className='bg-white bg-opacity-70 w-[44px] h-[44px] md:w-14 md:h-14 flex justify-center items-center flex-shrink-0'
               >
-                <FontAwesomeIcon icon={faBookmark} className='w-[21px] h-[27px] text-[#DC4B4B] cursor-pointer' />
+                <FontAwesomeIcon icon={solidfaBookmark} className='w-[21px] h-[27px] text-[#DC4B4B] cursor-pointer' />
               </button>
             </div>
             <p className='text-base md:text-2xl md:leading-9'>
