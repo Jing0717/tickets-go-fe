@@ -4,7 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark } from '@fortawesome/free-regular-svg-icons'
 import styles from './Card.module.css'
 
-const Card = ({ img, title }) => {
+interface CardProps {
+  img: string
+  title: string
+}
+
+const Card: React.FC<CardProps> = ({ img, title }) => {
   return (
     <div
       className={` w-[400px] mt-10 bg-white rounded-lg shadow-md border-2 border-dashed border-gray-300 relative flex-shrink-0 ${styles.card}`}
