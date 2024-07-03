@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark } from '@fortawesome/free-regular-svg-icons'
 import { faBookmark as solidfaBookmark } from '@fortawesome/free-solid-svg-icons'
 import Card from '@/components/Card'
-import { useState } from 'react'
+import { FC, useState } from 'react'
 
 interface AccordionItemProps {
   date: string
@@ -32,7 +32,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, title, content, img
         <div className='border-b-2 border-gray-03 p-7 bg-white'>
           <div className='flex flex-col md:flex-row items-start md:items-center'>
             <div className='relative w-full h-64 md:max-w-[526px] md:pr-4 mb-4 md:mb-0'>
-              <Image src={img} layout='fill' objectFit='cover' alt='Event Image' className='' />
+              <Image src={img} alt='Event Image' className='' fill style={{ objectFit: 'cover' }} />
               <button
                 type='button'
                 className='absolute top-0 right-0 bg-white bg-opacity-70 w-[44px] h-[44px] flex justify-center items-center flex-shrink-0 z-10'
@@ -54,6 +54,34 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, title, content, img
     </div>
   )
 }
+
+interface EventCardProps {
+  img: string
+  title: string
+  index: number
+}
+
+const EventCard: FC<EventCardProps> = ({ img, title, index }) => {
+  const marginStyle = index % 2 === 0 ? 'mb-20' : 'mt-20'
+
+  return (
+    <div
+      className={`relative w-[306px] h-[400px] overflow-hidden shadow-md cursor-pointer transform transition-transform duration-300 hover:scale-95 ${marginStyle}`}
+    >
+      <Image src={img} layout='fill' objectFit='cover' alt={title} className='absolute inset-0 w-full h-full' />
+      <div className='absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
+        <h3 className='text-white text-xl font-bold'>{title}</h3>
+      </div>
+    </div>
+  )
+}
+
+const events = [
+  { img: '/event1.jpeg', title: '演唱會' },
+  { img: '/event2.jpeg', title: '見面會' },
+  { img: '/event3.jpeg', title: '音樂會' },
+  { img: '/event4.jpeg', title: '試映會' }
+]
 
 export default function Home() {
   return (
@@ -97,12 +125,22 @@ export default function Home() {
 
         <div className='absolute right-0 top-[2rem] w-full md:top-auto md:w-[50vw] h-[286px] md:h-[647px]'>
           <div className='relative w-full h-full'>
-            <Image src='/hero.jpeg' layout='fill' objectFit='cover' alt='Hero Image' />
+            <Image
+              src='/hero.jpeg'
+              alt='Hero Image'
+              fill
+              sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw'
+              style={{ objectFit: 'cover' }}
+            />
           </div>
         </div>
       </div>
       <div className='bg-background pb-20'>
-        <div className='container overflow-hidden'>
+        <div className='container overflow-hidden py-20'>
+          <div className='flex items-center justify-between'>
+            <h2 className='font-bold text-3xl'>近期活動</h2>
+            <span className='ml-2 border-b-2 border-red-500 w-20'></span>
+          </div>
           <div className='flex space-x-6 justify-between'>
             <Card img={'/image14.jpg'} title={'ITZY 2ND WORLD TOUR'} />
             <Card img={'/image15.jpg'} title={'滅火器 Fire EX.《一生到底 One Life， One Shot》'} />
@@ -110,8 +148,8 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className='py-20 bg-background'>
-        <div className='container '>
+      <div className='bg-background'>
+        <div className='container py-20'>
           <div className='flex items-center justify-between mb-10'>
             <h2 className='font-bold text-3xl'>即將舉辦</h2>
             <span className='ml-2 border-b-2 border-red-500 w-20'></span>
@@ -135,6 +173,20 @@ export default function Home() {
               content="The Th3ee Guys are coming to Taipei with 'style'. Are you guys ready to 'Suit Up' for an awesome night??"
               img='/image16.jpg'
             />
+          </div>
+        </div>
+        <div className='container mx-auto py-20'>
+          <div className='flex justify-between items-center mb-10'>
+            <div className=''>
+              <h2 className='font-bold text-3xl mb-4'>探索其他活動</h2>
+              <p className='text-gray-01 text-2xl leading-9'>深入每個角落，找到你的下一個冒險</p>
+            </div>
+            <div className='border-b-1 border-red-500 w-20'></div>
+          </div>
+          <div className='flex overflow-x-auto scrollbar-hide space-x-6'>
+            {events.map((event, index) => (
+              <EventCard key={index} img={event.img} title={event.title} index={index} />
+            ))}
           </div>
         </div>
       </div>

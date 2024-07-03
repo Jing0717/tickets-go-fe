@@ -11,9 +11,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ img, title }) => {
   return (
-    <div
-      className={` w-[400px] mt-10 bg-white rounded-lg shadow-md border-2 border-dashed border-gray-300 relative flex-shrink-0 ${styles.card}`}
-    >
+    <div className={`w-[400px] mt-10 bg-white rounded-lg shadow-md relative flex-shrink-0 ${styles.card}`}>
       <button
         type='button'
         className='absolute top-2 right-2 bg-white bg-opacity-70 w-[44px] h-[44px] flex justify-center items-center flex-shrink-0 z-10'
@@ -21,7 +19,7 @@ const Card: React.FC<CardProps> = ({ img, title }) => {
         <FontAwesomeIcon icon={faBookmark} className='w-[21px] h-[27px] cursor-pointer bg-transparent' />
       </button>
       <div className='relative w-full h-64 mb-4'>
-        <Image src={img} layout='fill' objectFit='cover' alt='Event Image' className='' />
+        <Image src={img} alt='Event Image' className='' fill style={{ objectFit: 'cover' }} />
       </div>
       <div className='p-4'>
         <button type='button' className='bg-[#DC4B4B] py-2 px-4 text-white font-semibold rounded w-full mb-4'>

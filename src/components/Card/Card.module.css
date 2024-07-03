@@ -1,16 +1,27 @@
+.card {
+  position: relative;
+  border-style: dashed;
+  border-width: 2px;
+  border-color: #d1d5db;
+  border-radius: 0.5rem;
+  border-image: repeating-linear-gradient(90deg, #d1d5db 10, #d1d5db 10px, transparent 20px, transparent 10px) 1;
+  overflow: hidden;
+  z-index: 1;
+}
+
 .card::after {
   content: '';
   position: absolute;
   bottom: -20px;
   left: 50%;
   width: 40px;
-  height: 20px;
-  background-color: white;
+  height: 40px;
+  background-color: #fffbf5;
   border-top: 2px dashed #d1d5db;
-  transform: translateX(-50%);
   border-left: 2px dashed #d1d5db;
   border-right: 2px dashed #d1d5db;
   border-bottom: none;
-  border-radius: 0 0 50% 50%;
-  z-index: 50;
+  border-radius: 50% 50% 0 0;
+  transform: translateX(-50%);
+  z-index: 2;
 }
