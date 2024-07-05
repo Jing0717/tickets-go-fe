@@ -71,6 +71,21 @@ export const authApi = createApi({
       query: ({ status }) => ({
         url: `event/follow?status=${status}`
       })
+    }),
+    getTags: builder.mutation<any, void>({
+      query: () => ({
+        url: 'tag/tags'
+      })
+    }),
+    getTag: builder.mutation<any, { id: string }>({
+      query: ({ id }) => ({
+        url: `tag/${id}`
+      })
+    }),
+    searchEvents: builder.mutation<any, { query: string }>({
+      query: ({ query }) => ({
+        url: `event/search?query=${query}`
+      })
     })
   })
 })
@@ -84,5 +99,8 @@ export const {
   useGetUsersMutation,
   useUpdateUserMutation,
   useGetUserOrdersMutation,
-  useGetUserTrackingListMutation
+  useGetUserTrackingListMutation,
+  useGetTagsMutation,
+  useGetTagMutation,
+  useSearchEventsMutation
 } = authApi
