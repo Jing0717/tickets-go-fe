@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 
-import { useGetTagsMutation, useGetTagMutation } from '@/store/authApi'
+import { useGetTagsMutation } from '@/store/authApi'
 import Spinner from '@/components/Spinner'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
@@ -15,7 +15,8 @@ interface Tags {
 
 const CategoryResults: React.FC = () => {
   const [getTags] = useGetTagsMutation()
-  const [getTag] = useGetTagMutation()
+
+  // const [getTag] = useGetTagMutation()
 
   const [loading, setLoading] = useState<boolean>(false)
   const [tags, setTags] = useState<Tags[]>([])

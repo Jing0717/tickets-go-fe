@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 
-import { useGetTagsMutation, useGetTagMutation, useSearchEventsMutation } from '@/store/authApi'
+import { useGetTagsMutation, useSearchEventsMutation } from '@/store/authApi'
 import Spinner from '@/components/Spinner'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
@@ -56,30 +56,34 @@ const SearchResults: React.FC = () => {
     fetchData()
   }, [getTags])
 
+  // useCallback 確保 fetchResults 只有在 searchEvents 發生改變時才會重新渲染，這樣 useEffect 就不會在每次渲染時都觸發
+  const fetchResults = useCallback(
+    async (searchQuery: string) => {
+      setLoading(true)
+      console.log(searchQuery)
+      try {
+        const res: any = await searchEvents({ query: searchQuery }).unwrap()
+        if (res.status) {
+          setEvents(res.data)
+        } else {
+          setEvents([])
+        }
+      } catch (error) {
+        setEvents([])
+      } finally {
+        setLoading(false)
+      }
+    },
+    [searchEvents]
+  )
+
   useEffect(() => {
     if (query && typeof query === 'string') {
       console.log(query)
       setSearchQuery(query)
       fetchResults(query)
     }
-  }, [query])
-
-  const fetchResults = async (searchQuery: string) => {
-    setLoading(true)
-    console.log(searchQuery)
-    try {
-      const res: any = await searchEvents({ query: searchQuery }).unwrap()
-      if (res.status) {
-        setEvents(res.data)
-      } else {
-        setEvents([])
-      }
-    } catch (error) {
-      setEvents([])
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [query, fetchResults])
 
   const handleButtonClick = (id: string) => {
     setSelectedTags(prevSelectedTags => {
