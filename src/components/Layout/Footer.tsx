@@ -16,7 +16,7 @@ const Footer = () => {
       <div className='container'>
         <div className='flex flex-col md:flex-row text-gray-03 text-sm'>
           <div className='mb-4 md:max-w-[429px] md:mr-10'>
-            <Image src='/logo.svg' alt='Logo' width={154} height={48} priority />
+            <Image src='/logo.svg' alt='Logo' width={154} height={48} />
             <p className='text-sm leading-4 mt-4'>
               在 TicketsGo，我們致力於為您提供無與倫比的購票體驗，讓您輕鬆訪問和購買各類活動的門票。
               無論您是音樂會的鐵杆粉絲，體育賽事的狂熱支援者，還是劇場和藝術表演的愛好者，TicketsGo 都能滿足您的需求。
@@ -66,8 +66,8 @@ const Footer = () => {
         <div className='flex flex-col md:flex-row justify-between mt-8 border-gray-03 border-t-1 pt-4'>
           <p className='text-gray-03'>Copyright © 2024 北六組 All Rights Reserved</p>
           <div className='flex space-x-4 mt-4 md:mt-0'>
-            <Image src='/fb.svg' alt='Logo' width={24} height={24} priority />
-            <Image src='/X.svg' alt='Logo' width={24} height={24} priority />
+            <Image src='/fb.svg' alt='Logo' width={24} height={24} />
+            <Image src='/X.svg' alt='Logo' width={24} height={24} />
           </div>
         </div>
       </div>

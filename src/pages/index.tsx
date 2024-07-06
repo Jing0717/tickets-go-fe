@@ -1,4 +1,3 @@
-import Layout from '@/components/Layout'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark } from '@fortawesome/free-regular-svg-icons'
@@ -85,7 +84,7 @@ const events = [
 
 export default function Home() {
   return (
-    <Layout>
+    <>
       <div className='relative pb-8 md:pb-0 w-full min-h-[625px] h-auto md:min-h-[807px] flex items-end md:items-center overflow-hidden'>
         <div
           className='absolute inset-0 bg-cover bg-center opacity-20 blur-sm'
@@ -190,6 +189,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

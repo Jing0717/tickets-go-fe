@@ -7,8 +7,8 @@ type AuthState = {
 };
 
 const initialState: AuthState = {
-  token: '',
-  isLogin: false,
+  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
+  isLogin: typeof window !== 'undefined' ? !!localStorage.getItem('token') : false,
   errorMessage: null,
 };
 
@@ -19,10 +19,16 @@ export const authSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
       state.isLogin = true;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', action.payload);
+      }
     },
     clearToken: (state) => {
-      state.token = '';
+      state.token = null;
       state.isLogin = false;
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+      }
     },
     setErrorMessage: (state, action: PayloadAction<string>) => {
       state.errorMessage = action.payload;
