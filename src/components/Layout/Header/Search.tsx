@@ -62,7 +62,7 @@ const Search: React.FC<InputProps> = ({ placeholder = '', onChange }) => {
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
-          className='hidden md:block w-[351px] h-[44px] pl-10 opacity-100 border border-gray-300 rounded'
+          className='hidden md:block w-[351px] h-[44px] pl-10 opacity-100 border border-gray-300'
         />
         <div className='hidden md:block'>
           {isInputFocused && (

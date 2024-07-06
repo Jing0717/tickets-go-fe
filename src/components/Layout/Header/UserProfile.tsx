@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-regular-svg-icons'
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch } from 'react-redux'
+import { clearToken } from '@/store/slices/authSlice'
 
 const UserProfile: React.FC = () => {
   const router = useRouter()
+  const dispatch = useDispatch();
 
   const handleNavigation = (path: string) => {
     router.push(path)
@@ -18,15 +20,19 @@ const UserProfile: React.FC = () => {
     setIsDropdownOpen(!isDropdownOpen)
   }
 
+  const handleLogout = () => {
+    dispatch(clearToken());
+  };
+
   return (
-    <div className='relative z-10'>
+    <div className='relative z-20'>
       <button className='flex justify-center items-center p-2 space-x-1 hover:cursor-pointer' onClick={toggleDropdown}>
         <FontAwesomeIcon icon={faUser} className='w-6 h-6' />
         <span className='font-noto-sans-tc'>Jacky</span>
         <FontAwesomeIcon icon={isDropdownOpen ? faAngleUp : faAngleDown} className='w-6 h-6' />
       </button>
       {isDropdownOpen && (
-        <ul className='flex flex-col p-2 space-y-1 bg-[#4A4A4A] absolute top-[62px] right-0 min-w-[144px]'>
+        <ul className='flex flex-col p-2 space-y-1 bg-[#4A4A4A] absolute top-[62px] right-0 min-w-[144px] z-30'>
           <li
             className='hover:bg-[#C6C6C6] hover:text-black text-white py-2 px-4 cursor-pointer'
             onClick={() => handleNavigation('/user')}
@@ -45,7 +51,7 @@ const UserProfile: React.FC = () => {
           >
             追蹤列表
           </li>
-          <li className='hover:bg-[#C6C6C6] hover:text-black text-white py-2 px-4 cursor-pointer'>登出</li>
+          <li className='hover:bg-[#C6C6C6] hover:text-black text-white py-2 px-4 cursor-pointer' onClick={handleLogout}>登出</li>
         </ul>
       )}
     </div>
