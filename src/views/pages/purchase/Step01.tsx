@@ -1,93 +1,132 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 
-const Step01 = () => {
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCalendarDays, faLocationDot } from '@fortawesome/free-solid-svg-icons'
+
+import { OrderTicketsType, TicketsType } from "@/types/purchase"
+
+interface StepsProps {
+  setCurrentStep: (step: number) => void;
+  orderTicket: OrderTicketsType;
+  tickets: TicketsType[];
+}
+
+const Step01 = ({ setCurrentStep, orderTicket }: StepsProps) => {
+
   return(
     <>
       <div className='bg-background'>
-          <div className="container mx-auto pb-20">
-            <Banner />
-          </div>
+        <div className="container mx-auto pb-20">
+          <Banner orderTicket={orderTicket} />
         </div>
-        <div className='bg-gray-04'>
-          <div className="container mx-auto py-20">
-            <TicketOrder />
-          </div>
+      </div>
+      <div className='bg-gray-04'>
+        <div className="container mx-auto py-20">
+          <TicketOrder setCurrentStep={setCurrentStep} tickets={orderTicket.tickets}  />
         </div>
-        </>
+      </div>
+    </>
   )
 }
 
-const Banner = () => {
+interface Props {
+  orderTicket: OrderTicketsType
+}
+
+const Banner = ({ orderTicket }: Props) => {
   return (
     <div className="grid grid-cols-3 gap-4">
+      {/* TODO: Image URL src={orderTicket.eventImages} */}
       <Image src="/event-info.png" alt="event info" width="0" height="0"sizes="100vw" className='col-span-3 lg:col-span-1 w-full h-auto' priority />
-      <div className='col-span-3 lg:col-span-2 py-3'>
-        <h3 className="h3">試映會-六角Node.js課程kick off</h3>
-        <p className="fs-6">2024/05/11(周六) 19:30(+0800)</p>
-        <p className="fs-6">高雄巨蛋 / 高雄市左營區博愛二路757號</p>
-        <div className='max-h-[2px] overflow-hidden'>
+      <div className='col-span-3 lg:col-span-2 py-3 text-gray-02'>
+        <h3 className="h3 font-bold text-gray-01 text-[24px] lg:text-[28px] mb-4 lg:mb-6">{orderTicket.eventName}</h3>
+        <div className='flex gap-4 items-center mb-3'>
+          <FontAwesomeIcon icon={faCalendarDays} className='w-5 h-5 text-brand-01' />
+          {/* TODO: sessionDate 目前只有時間沒有日期 */}
+          <p className="fs-6">{orderTicket.sessionDate}</p>
+        </div>
+        <div className='flex gap-4 items-center'>
+          <FontAwesomeIcon icon={faLocationDot} className='w-5 h-5 text-brand-01' />
+          <p className="fs-6">台北小巨蛋</p>
+        </div>
+        <div className='max-h-[2px] overflow-hidden my-4 lg:my-6'>
           <div className="border-t-[12px] border-gray-03 border-dashed"></div>
         </div>
-        <p>那些年，我們一起等待的這門課，是一段旅程，充滿了期待與不確定性。在長廊的每一個轉角，我們都希望能夠遇見彼此，分享那些無關緊要卻又無比珍貴的時光。課程如同一座橋樑，連接我們共同的夢想與現實，每一次課堂上的討論，每一個案例的分析，都深深烙印在我們的記憶中。這不僅是學習知識的過程，更是成長與自我發現的旅程。隨著季節的變換，我們也在不知不覺中改變，從青澀走向成熟，從懵懂走向明智。而現在回首，那些年我們一起等待的這門課，不僅教會了我們知識，更重要的是教會了我們如何去愛，如何去生活。</p>
+        <p className="fs-6 text-[14px] lg:text-[16px]">{orderTicket.eventContent}</p>
       </div>
     </div>
   );
 }
 
-const TicketOrder = () => {
-  const tickets = [
-    {
-      category: '全票',
-      area: '一樓特 A 區、綠 212、綠 213、綠 214、綠 215',
-      price: 'NTD 3,600',
-      mount: 10,
-    },
-    {
-      category: '全票',
-      area: '紅 218、紅 219、紅 220、橙 207、橙 208、橙 209',
-      price: 'NTD 3,200',
-      mount: 10,
-    },
-    {
-      category: '全票',
-      area: '紅 216、紅 217、橙 210、橙 211',
-      price: 'NTD 2,800',
-      mount: 10,
-    },
-    {
-      category: '全票',
-      area: '紅 218、紅 219、紅 220、橙 207、橙 208、橙 209',
-      price: 'NTD 2,600',
-      mount: 10,
-    },
-    {
-      category: '全票',
-      area: '綠 406、綠 407、綠 408、綠 409、綠 410',
-      price: 'NTD 1,800',
-      mount: 0,
-    },
-    {
-      category: '全票',
-      area: '橙 512、綠 513、綠 514、綠 515、綠 516、綠 517、綠 518',
-      price: 'NTD 1,400',
-      mount: 0,
-    },
-    {
-      category: '全票',
-      area: '橙 509、橙 510、橙 511',
-      price: 'NTD 800',
-      mount: 8,
-    },
-    {
-      category: '身障票',
-      area: '紅 218',
-      price: 'NTD 400',
-      mount: 2,
-    }
-  ];
+// interface Ticket {
+//   category: string;
+//   areaName: string;
+//   price: string;
+//   count: number;
+// }
 
-  const ticketBackground = (category: string) => {
+interface SelectedCount {
+  [areaName: string]: number;
+}
+
+const TicketOrder = ({ setCurrentStep, tickets }: StepsProps) => {
+  // const tickets: Ticket[] = [
+  //   {
+  //     category: '全票',
+  //     areaName: '一樓特 A 區、綠 212、綠 213、綠 214、綠 215',
+  //     price: 'NTD 3,600',
+  //     count: 10,
+  //   },
+
+  //   // {
+  //   //   category: '全票',
+  //   //   areaName: '紅 218、紅 219、紅 220、橙 207、橙 208、橙 209',
+  //   //   price: 'NTD 3,200',
+  //   //   count: 10,
+  //   // },
+  //   {
+  //     category: '全票',
+  //     areaName: '紅 216、紅 217、橙 210、橙 211',
+  //     price: 'NTD 2,800',
+  //     count: 10,
+  //   },
+  //   {
+  //     category: '全票',
+  //     areaName: '紅 218、紅 219、紅 220、橙 207、橙 208、橙 209',
+  //     price: 'NTD 2,600',
+  //     count: 10,
+  //   },
+  //   {
+  //     category: '全票',
+  //     areaName: '綠 406、綠 407、綠 408、綠 409、綠 410',
+  //     price: 'NTD 1,800',
+  //     count: 0,
+  //   },
+  //   {
+  //     category: '全票',
+  //     areaName: '橙 512、綠 513、綠 514、綠 515、綠 516、綠 517、綠 518',
+  //     price: 'NTD 1,400',
+  //     count: 0,
+  //   },
+  //   {
+  //     category: '全票',
+  //     areaName: '橙 509、橙 510、橙 511',
+  //     price: 'NTD 800',
+  //     count: 8,
+  //   },
+
+  //   // {
+  //   //   category: '身障票',
+  //   //   areaName: '紅 218',
+  //   //   price: 'NTD 400',
+  //   //   count: 2,
+  //   // }
+  // ];
+
+  const [selected, setSelected] = useState<SelectedCount>({});
+
+  const ticketBackground = (category: string): JSX.Element => {
     const color = category === '全票' ? '#FFECC8' : '#E1FFBA'
 
     return (
@@ -96,6 +135,35 @@ const TicketOrder = () => {
       </div>
     )
   }
+
+  const handleNextStep = () => {
+    setCurrentStep(2);
+  }
+
+  const ticketSelection = (areaName: string, count: number): JSX.Element => {
+    const currentSelected = selected[areaName] || 0;
+    const hasOtherSelections = Object.keys(selected).some(key => selected[key] > 0 && key !== areaName);
+    const enabledPlus = !hasOtherSelections && currentSelected < count;
+    const enabledMinus = currentSelected > 0;
+
+    const handlePlus = (): void => {
+      setSelected(prev => ({ ...prev, [areaName]: (prev[areaName] || 0) + 1 }));
+    };
+
+    const handleMinus = (): void => {
+      setSelected(prev => ({ ...prev, [areaName]: prev[areaName] - 1 }));
+    };
+
+    return (
+      count === 0
+      ? <h5 className="h5 font-[500] lg:text-[20px] text-gray-03">已售完</h5>
+      : <div className='flex items-center w-100 text-[24px] justify-end'>
+          <button className={`border border-brand-01 w-10 h-10 ${!enabledMinus ? 'text-gray-03' : 'text-brand-01'}`} onClick={handleMinus} disabled={!enabledMinus}>-</button>
+          <p className={`border-t border-b text-[14px] border-brand-01 w-12 h-10 flex justify-center items-center ${currentSelected === 0 ? 'text-gray-03' : 'text-gray-01'}`}>{currentSelected}</p>
+          <button className={`border border-brand-01 w-10 h-10 ${!enabledPlus ? 'text-gray-03' : 'text-brand-01'}`} onClick={handlePlus} disabled={!enabledPlus}>+</button>
+        </div>
+    );
+  };
 
   return (
     <>
@@ -114,17 +182,20 @@ const TicketOrder = () => {
           {tickets.map(ticket => (
             <React.Fragment key={JSON.stringify(ticket)}>
               <div className="grid grid-cols-12 gap-6 bg-white px-3 py-3 mt-2 items-center">
-                <div className="col-span-2 fs-6">{ticketBackground(ticket.category)}</div>
-                <div className="col-span-4 fs-7">{ticket.area}</div>
-                <div className="col-span-3 h5 text-[24px] text-brand-01 text-right">{ticket.price}</div>
-                <div className="col-span-3 h7 text-brand-01 text-right">{ticket.mount}</div>
+                {/* <div className="col-span-2 fs-6">{ticketBackground(ticket.category)}</div> */}
+                <div className="col-span-2 fs-6">{ticketBackground("全票")}</div>
+                <div className="col-span-4 fs-7">{ticket.areaName}</div>
+                {/* <div className="col-span-3 h5 text-[24px] text-brand-01 text-right">{ticket.price}</div> */}
+                {/* TODO: 缺少票價 */}
+                <div className="col-span-3 h5 text-[24px] text-brand-01 text-right">{1500}</div>
+                <div className="col-span-3 h7 text-brand-01 text-right">{ticketSelection(ticket.areaName, ticket.count)}</div>
               </div>
             </React.Fragment>
           ))}
         </div>
       </div>
       <div className='flex justify-end'>
-        <button className="py-4 px-6 rounded-none bg-brand-01 h6 text-white">下一步</button>
+        <button className="py-4 px-6 rounded-none bg-brand-01 h6 text-white lg:flex-initial flex-1" onClick={handleNextStep}>下一步</button>
       </div>
     </>
   );

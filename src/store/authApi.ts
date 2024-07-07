@@ -1,5 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+import { ApiRes } from '@/types/apiType'
+import { OrderTicketsType } from '@/types/purchase'
+
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({
@@ -86,7 +89,12 @@ export const authApi = createApi({
       query: ({ query }) => ({
         url: `event/search?query=${query}`
       })
-    })
+    }),
+    getOrderTickets: builder.mutation<ApiRes<OrderTicketsType>, { eventId: string, sessionId: string }>({
+      query: ({ eventId, sessionId }) => ({
+        url: `order/tickets?eventId=${eventId}&sessionId=${sessionId}`
+      })
+    }),
   })
 })
 
@@ -102,5 +110,6 @@ export const {
   useGetUserTrackingListMutation,
   useGetTagsMutation,
   useGetTagMutation,
-  useSearchEventsMutation
+  useSearchEventsMutation,
+  useGetOrderTicketsMutation,
 } = authApi
