@@ -1,14 +1,13 @@
 import React from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendarDays, faCouch } from '@fortawesome/free-solid-svg-icons'
 
-interface StepsProps {
-  setCurrentStep: (step: number) => void;
-}
+// interface StepsProps {
+//   setCurrentStep: (step: number) => void;
+// }
 
-const Step04 = ({ setCurrentStep }: StepsProps) => {
+const Step04 = () => {
 
   const handleSubmit = () => {
     console.log('go to 金流')

@@ -71,7 +71,7 @@ interface StepsContentrProps {
       case 2:
         return <Step03 setCurrentStep={setCurrentStep} />;
       case 3:
-        return <Step04 setCurrentStep={setCurrentStep} />;
+        return <Step04 />;
       case 4:
         return <Step05 />;
       default:

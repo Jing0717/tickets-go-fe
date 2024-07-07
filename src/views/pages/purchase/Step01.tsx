@@ -4,12 +4,11 @@ import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendarDays, faLocationDot } from '@fortawesome/free-solid-svg-icons'
 
-import { OrderTicketsType, TicketsType } from "@/types/purchase"
+import { OrderTicketsType } from "@/types/purchase"
 
 interface StepsProps {
   setCurrentStep: (step: number) => void;
   orderTicket: OrderTicketsType;
-  tickets: TicketsType[];
 }
 
 const Step01 = ({ setCurrentStep, orderTicket }: StepsProps) => {
@@ -23,7 +22,7 @@ const Step01 = ({ setCurrentStep, orderTicket }: StepsProps) => {
       </div>
       <div className='bg-gray-04'>
         <div className="container mx-auto py-20">
-          <TicketOrder setCurrentStep={setCurrentStep} tickets={orderTicket.tickets}  />
+          <TicketOrder setCurrentStep={setCurrentStep} orderTicket={orderTicket}  />
         </div>
       </div>
     </>
@@ -70,7 +69,10 @@ interface SelectedCount {
   [areaName: string]: number;
 }
 
-const TicketOrder = ({ setCurrentStep, tickets }: StepsProps) => {
+const TicketOrder = ({ setCurrentStep, orderTicket }: StepsProps) => {
+
+  const tickets = orderTicket.tickets;
+
   // const tickets: Ticket[] = [
   //   {
   //     category: '全票',
