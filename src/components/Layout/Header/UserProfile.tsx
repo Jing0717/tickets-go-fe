@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser } from '@fortawesome/free-regular-svg-icons'
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from 'react-redux'
 import { clearToken } from '@/store/slices/authSlice'
+import Image from 'next/image'
 
 const UserProfile: React.FC = () => {
   const router = useRouter()
@@ -27,7 +27,9 @@ const UserProfile: React.FC = () => {
   return (
     <div className='relative z-20'>
       <button className='flex justify-center items-center p-2 space-x-1 hover:cursor-pointer' onClick={toggleDropdown}>
-        <FontAwesomeIcon icon={faUser} className='w-6 h-6' />
+        <div className='relative w-8 h-8'>
+          <Image src='/avatar.jpeg' alt='Avatar' layout='fill' className='rounded-full object-cover' />
+        </div>
         <span className='font-noto-sans-tc'>Jacky</span>
         <FontAwesomeIcon icon={isDropdownOpen ? faAngleUp : faAngleDown} className='w-6 h-6' />
       </button>

@@ -3,31 +3,35 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBookmark } from '@fortawesome/free-regular-svg-icons'
 import { faBookmark as solidfaBookmark } from '@fortawesome/free-solid-svg-icons'
 import Card from '@/components/Card'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 
 interface AccordionItemProps {
   date: string
   title: string
   content: string
   img: string
+  isOpen?: boolean
 }
 
-const AccordionItem: React.FC<AccordionItemProps> = ({ date, title, content, img }) => {
-  const [isOpen, setIsOpen] = useState(false)
+const AccordionItem: FC<AccordionItemProps> = ({ date, title, content, img, isOpen = false }) => {
+  const [isItemOpen, setIsItemOpen] = useState(isOpen);
+
+  useEffect(() => {
+    setIsItemOpen(isOpen);
+  }, [isOpen]);
 
   return (
     <div className='bg-background'>
       <div
         className='flex justify-between items-center p-4 cursor-pointer border-b-1 border-gray-03'
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsItemOpen(!isItemOpen)}
       >
         <div className='flex space-x-4 text-gray-01'>
           <span className='text-xl'>{date}</span>
           <h3 className='font-medium text-xl leading-6 font-noto-sans-tc whitespace-pre-line'>{title}</h3>
         </div>
-        {/* <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} className='w-5 h-5' /> */}
       </div>
-      {isOpen && (
+      {isItemOpen && (
         <div className='border-b-2 border-gray-03 p-7 bg-white'>
           <div className='flex flex-col md:flex-row items-start md:items-center'>
             <div className='relative w-full h-64 md:max-w-[526px] md:pr-4 mb-4 md:mb-0'>
@@ -51,8 +55,8 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ date, title, content, img
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 interface EventCardProps {
   img: string
@@ -159,6 +163,7 @@ export default function Home() {
               title={`SUPER JUNIOR-L.S.S.THE SHOW ： \nTh3ee Guys in TAIPEI`}
               content="The Th3ee Guys are coming to Taipei with 'style'. Are you guys ready to 'Suit Up' for an awesome night??"
               img='/image14.jpg'
+              isOpen={true}
             />
             <AccordionItem
               date='2025/02/30'
