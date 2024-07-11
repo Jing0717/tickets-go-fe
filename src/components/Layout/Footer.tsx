@@ -1,5 +1,3 @@
-import { faAngleUp } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import React from 'react'
 import { useRouter } from 'next/router'
@@ -70,9 +68,6 @@ const Footer = () => {
             <Image src='/X.svg' alt='Logo' width={24} height={24} />
           </div>
         </div>
-      </div>
-      <div className='absolute bg-gray-03 right-6 bottom-[112px] md:right-[60px] md:bottom-[120px] w-[44px] h-[44px] flex justify-center items-center'>
-        <FontAwesomeIcon icon={faAngleUp} className='w-7 h-7' />
       </div>
     </div>
   )

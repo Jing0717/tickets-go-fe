@@ -102,7 +102,7 @@ const SearchResults: React.FC = () => {
     <div className='bg-[#FFFBF5]'>
       <section className='relative h-[286px] md:h-[480px]'>
         <div className='absolute inset-0 w-full h-full object-cover'>
-          <Image src='/result.png' alt='banner image' layout='fill' objectFit='cover' loading='lazy' />
+          <Image src='/result.png' alt='banner image' fill style={{ objectFit: 'cover' }} loading='lazy' />
         </div>
       </section>
       {loading ? (
@@ -139,7 +139,7 @@ const SearchResults: React.FC = () => {
             <div className='flex space-x-6 justify-between'>
               {events.length > 0 ? (
                 events.map(event => (
-                  <Card key={event.id} img={'/image14.jpg'} title={event.eventName} isMobileLayout={true} />
+                  <Card key={event.id} id={event.id} img={'/image14.jpg'} title={event.eventName} isMobileLayout={true} />
                 ))
               ) : (
                 <div className='text-center w-full pt-20'>
@@ -154,13 +154,16 @@ const SearchResults: React.FC = () => {
                 <h2 className='font-bold text-3xl'>為您推薦</h2>
               </div>
               <div className='flex justify-center md:justify-between flex-col md:flex-row flex-wrap lg:space-x-6'>
-                <Card img={'/image14.jpg'} title={'ITZY 2ND WORLD TOUR'} isMobileLayout={true} />
+                <Card id='1' img={'/image14.jpg'} title={'ITZY 2ND WORLD TOUR'} isMobileLayout={true} />
                 <Card
+                  id='2'
                   img={'/image15.jpg'}
                   title={'滅火器 Fire EX.《一生到底 One Life， One Shot》'}
                   isMobileLayout={true}
                 />
-                <Card img={'/image16.jpg'} title={'JP Saxe：A Grey Area World Tour'} isMobileLayout={true} />
+                <Card
+                  id='3'
+                  img={'/image16.jpg'} title={'JP Saxe：A Grey Area World Tour'} isMobileLayout={true} />
               </div>
             </div>
           </section>

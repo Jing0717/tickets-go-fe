@@ -1,10 +1,44 @@
 import requireAuth from '@/components/RequireAuth'
+import { useGetEventContentQuery } from '@/store/homeApi'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+import { format } from 'date-fns'
 
 const EventPage = () => {
   const router = useRouter()
   const { eventId } = router.query
+
+  const { data, error, isLoading } = useGetEventContentQuery(eventId as string);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {JSON.stringify(error)}</div>;
+
+  const event = data.data.events;
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const events = {
+    name: "2024 GMA SHOWCASE 金曲售票演唱會",
+    description: "SHOWCASE售票演唱會作為金曲國際音樂節系列活動之一，將在6/25(二)至6/27(四)晚間，帶來9組臺灣金曲卡司加上3組海外藝人卡司，於Corner Max精彩開演。",
+    sessions: [
+      {
+        sessionId: "667c0e76366e04e4a664333f",
+        location: "台北小巨蛋",
+        startDate: "Tue Jan 20 1970 20:57:07 GMT+0000 (Coordinated Universal Time)",
+        startTime: "17:00",
+        endTime: "19:00"
+      }
+    ],
+    tags: ["小巨蛋"],
+    tickets: [
+      { id: "1", type: "全票", salesTime: "2024/04/23 19:00(+0800) ~ 2024/05/05 16:00(+0800)", price: 5600 },
+      { id: "2", type: "全票", salesTime: "2024/04/23 19:00(+0800) ~ 2024/05/05 16:00(+0800)", price: 4600 },
+      { id: "3", type: "身障票", salesTime: "2024/04/23 19:00(+0800) ~ 2024/05/05 16:00(+0800)", price: 2300 }
+    ]
+  };
+
 
   return (
     <div className='relative pb-20'>
@@ -15,8 +49,36 @@ const EventPage = () => {
         fill
         style={{ objectFit: 'cover' }}
       />
-      <h1>活動 {eventId}</h1>
-      <div className='mt-[480px] m'>
+      <div className='container mt-[520px]'>
+        <h1 className='text-4xl font-bold mb-4'>{event.name}</h1>
+        <div className='text-lg mb-4'>
+          <p>{format(new Date(event.sessions[0].startDate), 'yyyy/MM/dd(E) HH:mm')}</p>
+          <p>{event.sessions[0].location}</p>
+        </div>
+        <button className='bg-red-500 text-white py-2 px-4 rounded'>立刻訂購</button>
+        <div className='border-t mt-8 bg-white'>
+          <div className='flex space-x-4 mt-4 bg-white'>
+            <button className='px-4 py-2 border-2 border-red-500 bg-white' onClick={() => scrollToSection('introduction')}>簡介</button>
+            <button className='px-4 py-2' onClick={() => scrollToSection('programInfo')}>節目資訊</button>
+            <button className='px-4 py-2' onClick={() => scrollToSection('ticketInfo')}>購票方式說明</button>
+            <button className='px-4 py-2' onClick={() => scrollToSection('refundInfo')}>退票說明</button>
+            <button className='px-4 py-2' onClick={() => scrollToSection('notice')}>注意事項</button>
+            <button className='px-4 py-2' onClick={() => scrollToSection('eventTicket')}>活動票券</button>
+          </div>
+
+          <div className='mt-4'>
+            <h2 id='introduction' className='text-2xl font-bold mb-2'>簡介</h2>
+            <p className='mb-4'>{event.description}</p>
+            <h2 id='programInfo' className='text-2xl font-bold mb-2'>節目資訊</h2>
+            <p className='mb-4'>
+              活動名稱：{event.name}<br />
+              活動日期：{format(new Date(event.sessions[0].startDate), 'yyyy/MM/dd(E) HH:mm')}<br />
+              活動地點：{event.sessions[0].location}<br />
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className=''>
         <div className='container w-full'>
           <Image
             src='/image19.png'
@@ -26,9 +88,9 @@ const EventPage = () => {
             className='w-full'
             style={{ objectFit: 'cover' }}
           />
-          <h1 className='text-2xl font-bold mb-4'>
+          <h2 id='ticketInfo' className='text-2xl font-bold mb-2 mt-8'>
             購票方式說明<span className='block border-t border-gray-300 mt-2'></span>
-          </h1>
+          </h2>
           <p className='mb-4 bg-gray-04 p-6'>
             您的Tickets Go會員需完成"電子郵件地址及手機號碼驗證"才能進行購票流程，請至
             <a href='https://Tickets Go.com/users/edit' className='text-blue-500 underline'>
@@ -114,10 +176,9 @@ const EventPage = () => {
               </ul>
             </li>
           </ol>
-          <h1 className='text-2xl font-bold mb-4 mt-8'>
-            退票說明
-            <span className='block border-t border-gray-300 mt-2'></span>
-          </h1>
+          <h2 id='refundInfo' className='text-2xl font-bold mb-2 mt-8'>
+            退票說明<span className='block border-t border-gray-300 mt-2'></span>
+          </h2>
           <p className='mb-4'>
             根據文化部訂定『藝文表演票券定型化契約應記載及不得記載事項』第六項「退、換票機制」之規定共有四種方案之退換票規定，本節目採用方案二：消費者請求退換票之時限為購買票券後3日內(不含購票日)，購買票券後第4日起不接受退換票申請，請求退換票日期以郵戳寄送日為準，退票需酌收票面金額5%手續費，範例如下：
           </p>
@@ -153,10 +214,9 @@ const EventPage = () => {
             Family Mart and send it to Tickets Go.
           </p>
 
-          <h1 className='text-2xl font-bold mb-4 mt-8'>
-            注意事項
-            <span className='block border-t border-gray-300 mt-2'></span>
-          </h1>
+          <h2 id='notice' className='text-2xl font-bold mb-2 mt-8'>
+            注意事項<span className='block border-t border-gray-300 mt-2'></span>
+          </h2>
           <ul className='list-disc pl-6 space-y-2 mb-4'>
             <li>
               請勿於拍賣網站或是其他非Tickets
@@ -189,6 +249,39 @@ const EventPage = () => {
             </li>
             <li>購票前請詳閱注意事項，一旦購票成功視為同意上述所有活動注意事項。</li>
           </ul>
+        </div>
+        <div className="bg-gray-04 py-20">
+          <div className="container">
+            <h2 id='eventTicket' className='text-2xl font-bold mb-2 mt-8'>
+              活動票券<span className='block border-t border-gray-300 mt-2'></span>
+            </h2>
+            <table className='w-full text-left mt-4 bg-white'>
+              <thead>
+                <tr>
+                  <th className='py-2 px-4'>票種</th>
+                  <th className='py-2 px-4'>販售時間</th>
+                  <th className='py-2 px-4'>售價</th>
+                  <th className='py-2 px-4'>數量</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.tickets.map((ticket) => (
+                  <tr key={ticket.id} className='border-b'>
+                    <td className='py-2 px-4'>{ticket.type}</td>
+                    <td className='py-2 px-4'>{ticket.salesTime}</td>
+                    <td className='py-2 px-4 text-red-500'>NTD {ticket.price.toLocaleString()}</td>
+                    <td className='py-2 px-4'>
+                      <div className='flex items-center'>
+                        <button className='px-2 py-1 border'>-</button>
+                        <span className='mx-2'>0</span>
+                        <button className='px-2 py-1 border'>+</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
