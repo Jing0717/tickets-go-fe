@@ -1,7 +1,17 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        port: '',
+        pathname: '/tickets-go-528dd.appspot.com/**',
+      },
+    ],
+  },
 }
 
 export default nextConfig
