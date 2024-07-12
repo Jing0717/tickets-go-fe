@@ -4,6 +4,8 @@ import { faBookmark } from '@fortawesome/free-regular-svg-icons'
 import { faBookmark as solidfaBookmark } from '@fortawesome/free-solid-svg-icons'
 import Card from '@/components/Card'
 import { FC, useEffect, useState } from 'react'
+import { useGetHomeEventsQuery } from '@/store/homeApi'
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 interface AccordionItemProps {
   date: string
@@ -12,13 +14,24 @@ interface AccordionItemProps {
   img: string
   isOpen?: boolean
 }
-
+const isFetchBaseQueryError = (error: any): error is FetchBaseQueryError => {
+  return error && typeof error.status === 'number';
+};
 const AccordionItem: FC<AccordionItemProps> = ({ date, title, content, img, isOpen = false }) => {
   const [isItemOpen, setIsItemOpen] = useState(isOpen);
+  const { error, isLoading } = useGetHomeEventsQuery();
 
   useEffect(() => {
     setIsItemOpen(isOpen);
   }, [isOpen]);
+  if (isLoading) return <div>Loading...</div>;
+  if (error) {
+    if (isFetchBaseQueryError(error)) {
+      return <div>Error: {error.status} - {JSON.stringify(error.data)}</div>;
+    } else {
+      return <div>Error: {error.message}</div>;
+    }
+  }
 
   return (
     <div className='bg-background'>
@@ -71,7 +84,7 @@ const EventCard: FC<EventCardProps> = ({ img, title, index }) => {
     <div
       className={`relative w-[306px] h-[400px] overflow-hidden shadow-md cursor-pointer transform transition-transform duration-300 hover:scale-95 ${marginStyle}`}
     >
-      <Image src={img} layout='fill' objectFit='cover' alt={title} className='absolute inset-0 w-full h-full' />
+      <Image src={img} fill style={{ objectFit: 'cover' }} alt={title} className='absolute inset-0 w-full h-full' />
       <div className='absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
         <h3 className='text-white text-xl font-bold'>{title}</h3>
       </div>
@@ -79,7 +92,7 @@ const EventCard: FC<EventCardProps> = ({ img, title, index }) => {
   )
 }
 
-const events = [
+const cardEvents = [
   { img: '/event1.jpeg', title: '演唱會' },
   { img: '/event2.jpeg', title: '見面會' },
   { img: '/event3.jpeg', title: '音樂會' },
@@ -87,6 +100,19 @@ const events = [
 ]
 
 export default function Home() {
+  const { data, error, isLoading } = useGetHomeEventsQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) {
+    if (isFetchBaseQueryError(error)) {
+      return <div>Error: {error.status} - {JSON.stringify(error.data)}</div>;
+    } else {
+      return <div>Error: {error.message}</div>;
+    }
+  }
+
+  const events = data?.data?.events || [];
+
   return (
     <>
       <div className='relative pb-8 md:pb-0 w-full min-h-[625px] h-auto md:min-h-[807px] flex items-end md:items-center overflow-hidden'>
@@ -145,19 +171,19 @@ export default function Home() {
             <span className='ml-2 border-b-2 border-red-500 w-20'></span>
           </div>
           <div className='flex space-x-6 justify-between'>
-            <Card img={'/image14.jpg'} title={'ITZY 2ND WORLD TOUR'} />
-            <Card img={'/image15.jpg'} title={'滅火器 Fire EX.《一生到底 One Life， One Shot》'} />
-            <Card img={'/image16.jpg'} title={'JP Saxe：A Grey Area World Tour'} />
+            {events.map((event: { id: string; name: string }) => (
+              <Card key={event.id} id={event.id} img={'/image14.jpg'} title={event.name} />
+            ))}
           </div>
         </div>
       </div>
       <div className='bg-background'>
-        <div className='container py-20'>
+        <div className='container pb-20'>
           <div className='flex items-center justify-between mb-10'>
             <h2 className='font-bold text-3xl'>即將舉辦</h2>
             <span className='ml-2 border-b-2 border-red-500 w-20'></span>
           </div>
-          <div className=''>
+          <div>
             <AccordionItem
               date='2025/02/30'
               title={`SUPER JUNIOR-L.S.S.THE SHOW ： \nTh3ee Guys in TAIPEI`}
@@ -181,14 +207,14 @@ export default function Home() {
         </div>
         <div className='container mx-auto py-20'>
           <div className='flex justify-between items-center mb-10'>
-            <div className=''>
+            <div>
               <h2 className='font-bold text-3xl mb-4'>探索其他活動</h2>
               <p className='text-gray-01 text-2xl leading-9'>深入每個角落，找到你的下一個冒險</p>
             </div>
             <div className='border-b-1 border-red-500 w-20'></div>
           </div>
           <div className='flex overflow-x-auto scrollbar-hide space-x-6'>
-            {events.map((event, index) => (
+            {cardEvents.map((event, index) => (
               <EventCard key={index} img={event.img} title={event.title} index={index} />
             ))}
           </div>

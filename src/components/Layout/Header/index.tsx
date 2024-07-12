@@ -6,11 +6,37 @@ import { useRouter } from 'next/router';
 import Search from './Search';
 import Notification from './Notification';
 import UserProfile from './UserProfile';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
+
 
 const Header = () => {
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setShowScrollToTop(true);
+      } else {
+        setShowScrollToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
 
   useEffect(() => {
     setIsClient(true);
@@ -54,6 +80,14 @@ const Header = () => {
           </div>
         </div>
       </div>
+      {showScrollToTop && (
+        <div
+          className='fixed z-10 bg-gray-03 right-6 bottom-[112px] md:right-[60px] md:bottom-[120px] w-[44px] h-[44px] flex justify-center items-center cursor-pointer'
+          onClick={scrollToTop}
+        >
+          <FontAwesomeIcon icon={faAngleUp} className='w-7 h-7' />
+        </div>
+      )}
     </div>
   );
 };

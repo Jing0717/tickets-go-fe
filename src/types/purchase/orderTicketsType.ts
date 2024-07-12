@@ -6,6 +6,6 @@ export type OrderTicketsType = {
   eventContent: string,
   eventImages: string,
   sessionId: string,
-  sessionDate: string,
+  sessionStartDate: string,
   tickets: TicketsType[]
 }
