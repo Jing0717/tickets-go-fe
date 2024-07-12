@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -6,12 +6,34 @@ import { faCalendarDays, faLocationDot } from '@fortawesome/free-solid-svg-icons
 
 import { OrderTicketsType } from "@/types/purchase"
 
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
+import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
+
+import { usePostOrderSeatsMutation } from '@/store/authApi'
+import { OrderSeatsType, AreaInfo, SeatsType as SeatsInfo } from '@/types/purchase';
+
 interface StepsProps {
   setCurrentStep: (step: number) => void;
   orderTicket: OrderTicketsType;
+  areaInfo: AreaInfo | undefined;
+  setAreaInfo: (areaInfo: AreaInfo) => void;
+  seatsInfo: SeatsInfo[]| undefined;
+  setSeatsInfo: (seatsInfo: SeatsInfo[]) => void;
 }
 
-const Step01 = ({ setCurrentStep, orderTicket }: StepsProps) => {
+const Step01 = ({
+  setCurrentStep,
+  orderTicket,
+  areaInfo,
+  setAreaInfo,
+  seatsInfo,
+  setSeatsInfo
+}: StepsProps) => {
+
+  dayjs.locale('zh-cn');
 
   return(
     <>
@@ -22,7 +44,14 @@ const Step01 = ({ setCurrentStep, orderTicket }: StepsProps) => {
       </div>
       <div className='bg-gray-04'>
         <div className="container mx-auto py-20">
-          <TicketOrder setCurrentStep={setCurrentStep} orderTicket={orderTicket}  />
+          <TicketOrder
+            setCurrentStep={setCurrentStep}
+            orderTicket={orderTicket}
+            areaInfo={areaInfo}
+            setAreaInfo={setAreaInfo}
+            seatsInfo={seatsInfo}
+            setSeatsInfo={setSeatsInfo}
+          />
         </div>
       </div>
     </>
@@ -34,16 +63,17 @@ interface Props {
 }
 
 const Banner = ({ orderTicket }: Props) => {
+  const eventDate = dayjs(+orderTicket.sessionStartDate).format('YYYY/MM/DD(dd) HH:mm(Z)');
+
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* TODO: Image URL src={orderTicket.eventImages} */}
-      <Image src="/event-info.png" alt="event info" width="0" height="0"sizes="100vw" className='col-span-3 lg:col-span-1 w-full h-auto' priority />
+      <Image src={orderTicket.eventImages} alt="event info" width="0" height="0" sizes="100vw" className='col-span-3 lg:col-span-1 w-full h-auto' priority />
       <div className='col-span-3 lg:col-span-2 py-3 text-gray-02'>
         <h3 className="h3 font-bold text-gray-01 text-[24px] lg:text-[28px] mb-4 lg:mb-6">{orderTicket.eventName}</h3>
         <div className='flex gap-4 items-center mb-3'>
           <FontAwesomeIcon icon={faCalendarDays} className='w-5 h-5 text-brand-01' />
-          {/* TODO: sessionDate 目前只有時間沒有日期 */}
-          <p className="fs-6">{orderTicket.sessionDate}</p>
+          <p className="fs-6">{eventDate}</p>
         </div>
         <div className='flex gap-4 items-center'>
           <FontAwesomeIcon icon={faLocationDot} className='w-5 h-5 text-brand-01' />
@@ -69,7 +99,7 @@ interface SelectedCount {
   [areaName: string]: number;
 }
 
-const TicketOrder = ({ setCurrentStep, orderTicket }: StepsProps) => {
+const TicketOrder = ({ setCurrentStep, orderTicket, areaInfo, setAreaInfo, seatsInfo, setSeatsInfo }: StepsProps) => {
 
   const tickets = orderTicket.tickets;
 
@@ -132,15 +162,62 @@ const TicketOrder = ({ setCurrentStep, orderTicket }: StepsProps) => {
     const color = category === '全票' ? '#FFECC8' : '#E1FFBA'
 
     return (
-      <div className="px-4 py-2 text-center" style={{ backgroundColor: color }} >
+      <div className="lg:px-4 px-2 py-2 text-center" style={{ backgroundColor: color }} >
         {category}
       </div>
     )
   }
 
+  const [postOrderSeats] = usePostOrderSeatsMutation();
+  const [orderSeats, setOrderSeats] = useState<OrderSeatsType>();
+
   const handleNextStep = () => {
-    setCurrentStep(2);
+    const selectedAreas = Object.entries(selected)
+                                .filter(([, value]) => value > 0)
+                                .map(([key, value]) => ({ areaName: key, count: value }));
+
+    if (selectedAreas.length === 0) {
+      toast.error('請先選擇區域票數後再點選下一步');
+
+      return;
+    }
+
+    const areaName = selectedAreas[0].areaName;
+    setAreaInfo(selectedAreas[0]);
+
+    // setCurrentStep(2);
+
+    // TODO: selectedSeats should move to Step02
+    const sessionId = orderTicket.sessionId;
+    fetchSeats(sessionId, areaName)
   }
+
+  const fetchSeats = async (sessionId: string, areaName: string) => {
+      try {
+        const data = await postOrderSeats({ sessionId: sessionId, areaName: areaName }).unwrap();
+        setOrderSeats(data.data);
+      } catch (error) {
+
+        setOrderSeats(undefined);
+        console.error('Failed to fetch seats:', error);
+      }
+    }
+
+  useEffect(()=>{
+    if (!!orderSeats && !!areaInfo) {
+      console.log('orderSeats:', orderSeats)
+      const seatCount = areaInfo.count;
+      const seatsToAdd = orderSeats.seats.slice(0, seatCount);
+      setSeatsInfo(seatsToAdd)
+    }
+  },[orderSeats, areaInfo, setSeatsInfo])
+
+  useEffect(() => {
+    if (!!seatsInfo){
+      setCurrentStep(2);
+      console.log('seatsInfo:', seatsInfo)
+    }
+  },[seatsInfo, setCurrentStep]);
 
   const ticketSelection = (areaName: string, count: number): JSX.Element => {
     const currentSelected = selected[areaName] || 0;
@@ -171,26 +248,24 @@ const TicketOrder = ({ setCurrentStep, orderTicket }: StepsProps) => {
     <>
       <h2 className='lg:text-[32px] text-[24px] font-bold text-gray-01 mb-10'>活動票券</h2>
       <div className="grid grid-cols-12 gap-10 mb-10">
-        <div className='col-span-12 lg:col-span-5 bg-white flex items-center'>
-          <Image src="/stage-info.png" alt="stage info" width="0" height="0"sizes="100vw" className='w-full h-auto' priority />
+        <div className='col-span-12 lg:col-span-5 bg-white flex items-center' style={{ maxWidth: 'calc(100vw - 24px)' }}>
+          <Image src="/stage-info.png" alt="stage info" width="0" height="0"sizes="100vw" className='w-full h-auto'  priority />
         </div>
-        <div className='col-span-12 lg:col-span-7 text-gray-01'>
+        <div className='col-span-12 lg:col-span-7 text-gray-01' style={{ maxWidth: 'calc(100vw - 24px)' }}>
           <div className="grid grid-cols-12 gap-6 bg-white px-3 py-2">
-            <div className="col-span-2 fs-6">票種</div>
-            <div className="col-span-4 fs-6">座位區</div>
-            <div className="col-span-3 fs-6 text-right">售票</div>
-            <div className="col-span-3 fs-6 text-right">數量</div>
+            <div className="col-span-3 lg:col-span-2 fs-6">票種</div>
+            <div className="col-span-3 lg:col-span-2 fs-6">座位區</div>
+            <div className="col-span-3 lg:col-span-4 fs-6 text-right">售票</div>
+            <div className="col-span-3 lg:col-span-4 fs-6 text-right">數量</div>
           </div>
           {tickets.map(ticket => (
             <React.Fragment key={JSON.stringify(ticket)}>
               <div className="grid grid-cols-12 gap-6 bg-white px-3 py-3 mt-2 items-center">
                 {/* <div className="col-span-2 fs-6">{ticketBackground(ticket.category)}</div> */}
-                <div className="col-span-2 fs-6">{ticketBackground("全票")}</div>
-                <div className="col-span-4 fs-7">{ticket.areaName}</div>
-                {/* <div className="col-span-3 h5 text-[24px] text-brand-01 text-right">{ticket.price}</div> */}
-                {/* TODO: 缺少票價 */}
-                <div className="col-span-3 h5 text-[24px] text-brand-01 text-right">{1500}</div>
-                <div className="col-span-3 h7 text-brand-01 text-right">{ticketSelection(ticket.areaName, ticket.count)}</div>
+                <div className="col-span-3 lg:col-span-2 fs-6">{ticketBackground("全票")}</div>
+                <div className="col-span-3 lg:col-span-2 fs-5">{ticket.areaName}</div>
+                <div className="col-span-3 lg:col-span-4 h5 text-[24px] text-brand-01 text-right"><span className="lg:inline hidden">NTD </span>{`${ticket.price}`}</div>
+                <div className="col-span-3 lg:col-span-4 h7 text-brand-01 text-right">{ticketSelection(ticket.areaName, ticket.count)}</div>
               </div>
             </React.Fragment>
           ))}

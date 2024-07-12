@@ -3,6 +3,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { useGetOrderTicketsMutation } from '@/store/authApi'
 import { OrderTicketsType } from "@/types/purchase"
+import { AreaInfo, SeatsType as SeatsInfo} from '@/types/purchase';
 
 // Components
 import { Stepper, Step01, Step02, Step03, Step04, Step05 } from '@/views/pages/purchase';
@@ -21,7 +22,9 @@ const Purchase = () => {
   const eventId = params.get('eventId') || "";
   const sessionId = params.get('sessionId') || "";
   const [getOrderTickets] = useGetOrderTicketsMutation();
-  const [orderTicket, setOrderTickets] = useState<OrderTicketsType  | undefined>();
+  const [orderTicket, setOrderTickets] = useState<OrderTicketsType | undefined>();
+  const [areaInfo, setAreaInfo] = useState<AreaInfo | undefined>();
+  const [seatsInfo, setSeatsInfo] = useState<SeatsInfo[] | undefined>();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -42,7 +45,11 @@ const Purchase = () => {
 
   },[eventId, sessionId, getOrderTickets])
 
-  useEffect(()=> {console.log('orderTicket:', orderTicket)},[orderTicket])
+  useEffect(()=> {
+    if(!!orderTicket){
+      console.log('orderTicket:', orderTicket)
+    }
+  },[orderTicket])
 
   return (
     <>
@@ -51,7 +58,16 @@ const Purchase = () => {
           <Stepper steps={steps} currentStep={currentStep} setCurrentStep={setCurrentStep} />
         </div>
       </div>
-      { orderTicket && <StepsContent currentStep={currentStep} setCurrentStep={setCurrentStep} orderTicket={orderTicket} /> }
+      { orderTicket &&
+        <StepsContent
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          orderTicket={orderTicket}
+          areaInfo={areaInfo}
+          setAreaInfo={setAreaInfo}
+          seatsInfo={seatsInfo}
+          setSeatsInfo={setSeatsInfo}
+        /> }
     </>
   )
 }
@@ -60,16 +76,42 @@ interface StepsContentrProps {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   orderTicket: OrderTicketsType;
+  areaInfo: AreaInfo | undefined;
+  setAreaInfo: (areaInfo: AreaInfo | undefined) => void;
+  seatsInfo: SeatsInfo[] | undefined;
+  setSeatsInfo: (seatsInfo: SeatsInfo[] | undefined) => void;
 }
 
-  const StepsContent = ({ currentStep, setCurrentStep, orderTicket }: StepsContentrProps) => {
+  const StepsContent = ({
+    currentStep,
+    setCurrentStep,
+    orderTicket,
+    areaInfo,
+    setAreaInfo,
+    seatsInfo,
+    setSeatsInfo
+  }: StepsContentrProps) => {
     switch (currentStep) {
       case 0:
-        return <Step01 setCurrentStep={setCurrentStep} orderTicket={orderTicket} />;
+        return <Step01
+                  setCurrentStep={setCurrentStep}
+                  orderTicket={orderTicket}
+                  areaInfo={areaInfo}
+                  setAreaInfo={setAreaInfo}
+                  seatsInfo={seatsInfo}
+                  setSeatsInfo={setSeatsInfo}
+                />;
       case 1:
         return <Step02 />;
       case 2:
-        return <Step03 setCurrentStep={setCurrentStep} />;
+        return <Step03
+                  orderTicket={orderTicket}
+                  setCurrentStep={setCurrentStep}
+                  areaInfo={areaInfo}
+                  setAreaInfo={setAreaInfo}
+                  seatsInfo={seatsInfo}
+                  setSeatsInfo={setSeatsInfo}
+                />;
       case 3:
         return <Step04 />;
       case 4:
