@@ -8,10 +8,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'storage.googleapis.com',
         port: '',
-        pathname: '/tickets-go-528dd.appspot.com/**',
-      },
+        pathname: '/tickets-go-528dd.appspot.com/**'
+      }
     ],
-  },
+    domains: ['t.kfs.io']
+  }
 }
 
 export default nextConfig

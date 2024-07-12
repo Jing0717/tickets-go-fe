@@ -4,6 +4,15 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { format } from 'date-fns'
 
+interface Session {
+  sessionId: string;
+  location: string;
+  startDate: string;
+  startTime: string;
+  endTime: string;
+}
+
+
 const EventPage = () => {
   const router = useRouter()
   const { eventId } = router.query
@@ -18,27 +27,6 @@ const EventPage = () => {
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  const events = {
-    name: "2024 GMA SHOWCASE 金曲售票演唱會",
-    description: "SHOWCASE售票演唱會作為金曲國際音樂節系列活動之一，將在6/25(二)至6/27(四)晚間，帶來9組臺灣金曲卡司加上3組海外藝人卡司，於Corner Max精彩開演。",
-    sessions: [
-      {
-        sessionId: "667c0e76366e04e4a664333f",
-        location: "台北小巨蛋",
-        startDate: "Tue Jan 20 1970 20:57:07 GMT+0000 (Coordinated Universal Time)",
-        startTime: "17:00",
-        endTime: "19:00"
-      }
-    ],
-    tags: ["小巨蛋"],
-    tickets: [
-      { id: "1", type: "全票", salesTime: "2024/04/23 19:00(+0800) ~ 2024/05/05 16:00(+0800)", price: 5600 },
-      { id: "2", type: "全票", salesTime: "2024/04/23 19:00(+0800) ~ 2024/05/05 16:00(+0800)", price: 4600 },
-      { id: "3", type: "身障票", salesTime: "2024/04/23 19:00(+0800) ~ 2024/05/05 16:00(+0800)", price: 2300 }
-    ]
-  };
-
 
   return (
     <div className='relative pb-20'>
@@ -258,24 +246,22 @@ const EventPage = () => {
             <table className='w-full text-left mt-4 bg-white'>
               <thead>
                 <tr>
-                  <th className='py-2 px-4'>票種</th>
-                  <th className='py-2 px-4'>販售時間</th>
-                  <th className='py-2 px-4'>售價</th>
-                  <th className='py-2 px-4'>數量</th>
+                  <th className='py-2 px-4'>場次時間</th>
+                  <th className='py-2 px-4'>活動地點</th>
+                  <th className='py-2 px-4'>開始時間</th>
+                  <th className='py-2 px-4'>結束時間</th>
                 </tr>
               </thead>
               <tbody>
-                {events.tickets.map((ticket) => (
-                  <tr key={ticket.id} className='border-b'>
-                    <td className='py-2 px-4'>{ticket.type}</td>
-                    <td className='py-2 px-4'>{ticket.salesTime}</td>
-                    <td className='py-2 px-4 text-red-500'>NTD {ticket.price.toLocaleString()}</td>
+                {event.sessions.map((ticket: Session) => (
+                  <tr key={ticket.sessionId} className='border-b hover:cursor-pointer' onClick={() => {
+                    router.push(`/purchase?eventId=${eventId}&sessionId=${ticket.sessionId}`);
+                  }}>
+                    <td className='py-2 px-4'>{ticket.startDate}</td>
+                    <td className='py-2 px-4'>{ticket.location}</td>
+                    <td className='py-2 px-4 text-red-500'>{ticket.startTime}</td>
                     <td className='py-2 px-4'>
-                      <div className='flex items-center'>
-                        <button className='px-2 py-1 border'>-</button>
-                        <span className='mx-2'>0</span>
-                        <button className='px-2 py-1 border'>+</button>
-                      </div>
+                      {ticket.endTime}
                     </td>
                   </tr>
                 ))}
