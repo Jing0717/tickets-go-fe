@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendarDays, faCouch } from '@fortawesome/free-solid-svg-icons'
@@ -8,6 +9,9 @@ import { faCalendarDays, faCouch } from '@fortawesome/free-solid-svg-icons'
 // }
 
 const Step04 = () => {
+  const params = useSearchParams();
+  const orderId = params.get('orderId') || "";
+  console.log('orderId:', orderId)
 
   const handleSubmit = () => {
     console.log('go to 金流')

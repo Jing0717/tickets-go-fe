@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendarDays, faCouch } from '@fortawesome/free-solid-svg-icons'
 
-import { OrderTicketsType, AreaInfo, SeatsType as SeatsInfo } from '@/types/purchase';
+import { usePostOrderCreateMutation } from '@/store/authApi';
+import { OrderTicketsType, AreaInfo, SeatsType as SeatsInfo, OrderCreateParams, OrderCreateType } from '@/types/purchase';
 
 import dayjs from "dayjs";
 import 'dayjs/locale/zh-cn';
+
 
 interface StepsProps {
   orderTicket: OrderTicketsType;
@@ -85,10 +88,78 @@ const PaymentForm = ({
 }: Props) => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormInput>();
 
+  const router = useRouter();
+
+  // const [searchParams, setSearchParams] = useSearchParams();
+
+  const [postOrderCreate] = usePostOrderCreateMutation();
+  const [orderCreate, setOrderCreate] = useState<OrderCreateType>();
+
   const onSubmit: SubmitHandler<FormInput> = data => {
     console.log(data);
-    setCurrentStep(3)
+    const user = JSON.parse(localStorage.getItem("user") as string ?? "");
+    const userName = !!user ? user.email as string : "";
+    const sessionId = router.query.sessionId as string || "";
+    const { count, areaName } = areaInfo as AreaInfo;
+    const seats = seatsInfo as SeatsInfo[];
+
+    const orderCreateReq = {
+      userName,
+      sessionId,
+      count,
+      areaName,
+      seats
+    }
+
+    console.log('orderCreateReq:', orderCreateReq)
+    postOrder(orderCreateReq)
+
+    // setCurrentStep(3)
   };
+
+  const postOrder = async (req: OrderCreateParams) => {
+    try {
+      const data = await postOrderCreate(req).unwrap();
+      setOrderCreate(data.data);
+    } catch (error) {
+
+      setOrderCreate(undefined);
+      console.error('Failed to fetch seats:', error);
+    }
+  }
+
+  useEffect(() => {
+    const addOrderId = (orderId: string) => {
+      const newParams = { ...router.query, orderId };
+      updateQueryParams(newParams);
+    };
+
+    const updateQueryParams = (newParams: any) => {
+      router.replace({
+        pathname: router.pathname,
+        query: { ...router.query, ...newParams }
+      }, undefined, { shallow: true });
+    };
+
+    if (!!orderCreate) {
+      console.log('orderCreate:', orderCreate);
+      const orderId = orderCreate._id;
+      addOrderId(orderId);
+      setCurrentStep(3)
+    }
+  },[orderCreate, router, router.query, setCurrentStep]);
+
+  // function addOrderId(orderId: string) {
+  //   const currentParams = Object.fromEntries([...searchParams]);
+  //   currentParams.orderId = orderId;
+
+  //   const newQueryParams = new URLSearchParams(currentParams).toString();
+
+  //   router.replace({
+  //       pathname: router.pathname,
+  //       query: newQueryParams,
+  //   }, undefined, { shallow: true });
+  // }
 
   const handlePrevStep = () => {
     setAreaInfo(undefined);

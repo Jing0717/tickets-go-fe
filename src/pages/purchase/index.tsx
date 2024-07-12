@@ -25,6 +25,7 @@ const Purchase = () => {
   const [orderTicket, setOrderTickets] = useState<OrderTicketsType | undefined>();
   const [areaInfo, setAreaInfo] = useState<AreaInfo | undefined>();
   const [seatsInfo, setSeatsInfo] = useState<SeatsInfo[] | undefined>();
+  
 
   useEffect(() => {
     const fetchTickets = async () => {

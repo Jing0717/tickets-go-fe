@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 import { ApiRes } from '@/types/apiType'
-import { OrderTicketsType, OrderSeatsType } from '@/types/purchase'
+import { OrderTicketsType, OrderSeatsType, OrderCreateType, OrderCreateParams } from '@/types/purchase'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -102,6 +102,13 @@ export const authApi = createApi({
         body
       })
     }),
+    postOrderCreate: builder.mutation<ApiRes<OrderCreateType>, OrderCreateParams>({
+      query: ({ ...body }) => ({
+        url: 'order/create',
+        method: 'POST',
+        body
+      })
+    }),
   })
 })
 
@@ -120,4 +127,5 @@ export const {
   useSearchEventsMutation,
   useGetOrderTicketsMutation,
   usePostOrderSeatsMutation,
+  usePostOrderCreateMutation,
 } = authApi
