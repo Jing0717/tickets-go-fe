@@ -3,6 +3,9 @@ import { useGetEventContentQuery } from '@/store/homeApi'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { format } from 'date-fns'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCalendar } from '@fortawesome/free-regular-svg-icons'
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons'
 
 interface Session {
   sessionId: string;
@@ -29,7 +32,7 @@ const EventPage = () => {
   };
 
   return (
-    <div className='relative pb-20'>
+    <div className='relative pb-20 bg-brand-02'>
       <Image
         src='/event-hero.jpeg'
         alt='Event Image'
@@ -39,19 +42,21 @@ const EventPage = () => {
       />
       <div className='container mt-[520px]'>
         <h1 className='text-4xl font-bold mb-4'>{event.name}</h1>
-        <div className='text-lg mb-4'>
-          <p>{format(new Date(event.sessions[0].startDate), 'yyyy/MM/dd(E) HH:mm')}</p>
-          <p>{event.sessions[0].location}</p>
+        <div className='text-lg mb-4 font-noto-sans-tc'>
+          <p><FontAwesomeIcon icon={faCalendar} className='text-brand-01 pr-4' />{format(new Date(event.sessions[0].startDate), 'yyyy/MM/dd(E) HH:mm')}</p>
+          <p><FontAwesomeIcon icon={faLocationDot} className='text-brand-01 pr-4' />{event.sessions[0].location}</p>
         </div>
-        <button className='bg-red-500 text-white py-2 px-4 rounded'>立刻訂購</button>
-        <div className='border-t mt-8 bg-white'>
-          <div className='flex space-x-4 mt-4 bg-white'>
-            <button className='px-4 py-2 border-2 border-red-500 bg-white' onClick={() => scrollToSection('introduction')}>簡介</button>
-            <button className='px-4 py-2' onClick={() => scrollToSection('programInfo')}>節目資訊</button>
-            <button className='px-4 py-2' onClick={() => scrollToSection('ticketInfo')}>購票方式說明</button>
-            <button className='px-4 py-2' onClick={() => scrollToSection('refundInfo')}>退票說明</button>
-            <button className='px-4 py-2' onClick={() => scrollToSection('notice')}>注意事項</button>
-            <button className='px-4 py-2' onClick={() => scrollToSection('eventTicket')}>活動票券</button>
+        <div className='border-t mt-8'>
+          <div className='flex space-x-4 mt-4 bg-white justify-between items-center px-6 pt-6 pb-[26px]'>
+            <div className="">
+              <button className='px-4 py-2 hover:border-2 hover:border-red-500 bg-white' onClick={() => scrollToSection('introduction')}>簡介</button>
+              <button className='px-4 py-2 hover:border-2 hover:border-red-500' onClick={() => scrollToSection('programInfo')}>節目資訊</button>
+              <button className='px-4 py-2 hover:border-2 hover:border-red-500' onClick={() => scrollToSection('ticketInfo')}>購票方式說明</button>
+              <button className='px-4 py-2 hover:border-2 hover:border-red-500' onClick={() => scrollToSection('refundInfo')}>退票說明</button>
+              <button className='px-4 py-2 hover:border-2 hover:border-red-500' onClick={() => scrollToSection('notice')}>注意事項</button>
+              <button className='px-4 py-2 hover:border-2 hover:border-red-500' onClick={() => scrollToSection('eventTicket')}>活動票券</button>
+            </div>
+            <button className='bg-red-500 text-white py-4 px-[66px] leading-4'>立刻訂購</button>
           </div>
 
           <div className='mt-4'>
@@ -243,30 +248,30 @@ const EventPage = () => {
             <h2 id='eventTicket' className='text-2xl font-bold mb-2 mt-8'>
               活動票券<span className='block border-t border-gray-300 mt-2'></span>
             </h2>
-            <table className='w-full text-left mt-4 bg-white'>
-              <thead>
-                <tr>
-                  <th className='py-2 px-4'>場次時間</th>
-                  <th className='py-2 px-4'>活動地點</th>
-                  <th className='py-2 px-4'>開始時間</th>
-                  <th className='py-2 px-4'>結束時間</th>
-                </tr>
-              </thead>
-              <tbody>
+            <div className='w-full text-left mt-4'>
+              <div className='bg-white'>
+                <div className='py-2 px-4 grid' style={{ gridTemplateColumns: '600px 200px 150px 150px' }}>
+                  <div className='whitespace-nowrap'>場次時間</div>
+                  <div className='whitespace-nowrap'>活動地點</div>
+                  <div className='whitespace-nowrap'>開始時間</div>
+                  <div className='whitespace-nowrap'>結束時間</div>
+                </div>
+              </div>
+              <div className='space-y-2 mt-2'>
                 {event.sessions.map((ticket: Session) => (
-                  <tr key={ticket.sessionId} className='border-b hover:cursor-pointer' onClick={() => {
+                  <div key={ticket.sessionId} className='border-b hover:cursor-pointer bg-white' onClick={() => {
                     router.push(`/purchase?eventId=${eventId}&sessionId=${ticket.sessionId}`);
                   }}>
-                    <td className='py-2 px-4'>{ticket.startDate}</td>
-                    <td className='py-2 px-4'>{ticket.location}</td>
-                    <td className='py-2 px-4 text-red-500'>{ticket.startTime}</td>
-                    <td className='py-2 px-4'>
-                      {ticket.endTime}
-                    </td>
-                  </tr>
+                    <div className='py-2 px-4 grid' style={{ gridTemplateColumns: '600px 200px 150px 150px' }}>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.startDate}</div>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.location}</div>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.startTime}</div>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.endTime}</div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
