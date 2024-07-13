@@ -24,6 +24,7 @@ interface Order {
 interface Event {
   id: string
   eventName: string
+  eventIntro: string
   eventContent: string
   tags: string[]
   eventStartDate: number
@@ -177,7 +178,7 @@ const UserOrders: React.FC = () => {
                 <div className='flex flex-col md:flex-row  justify-between'>
                   <div className='w-full mb-3 md:w-1/3 md:mb-0'>
                     <h2 className='text-xl text-[#1E1E1E] font-medium mb-3'>{event?.eventName}</h2>
-                    <p className='overflow-hidden truncate'>{event?.eventContent}</p>
+                    <p className='overflow-hidden truncate'>{event?.eventIntro}</p>
                   </div>
                   <div className='w-full md:w-2/3 flex justify-center md:justify-end items-center'>
                     <button className='bg-white text-black border-2 border-black p-2 w-full md:w-28 h-11 mr-4 hover:bg-black hover:text-white transition-colors duration-300'>
