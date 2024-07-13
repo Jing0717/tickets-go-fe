@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 import { ApiRes } from '@/types/apiType'
-import { OrderTicketsType, OrderSeatsType, OrderCreateType, OrderCreateParams } from '@/types/purchase'
+import { OrderTicketsType, OrderSeatsType, OrderCreateType, OrderCreateParams, NewebpayCheckout, OrderByIdType } from '@/types/purchase'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -109,6 +109,18 @@ export const authApi = createApi({
         body
       })
     }),
+    postNewebpayCheckout: builder.mutation<ApiRes<NewebpayCheckout>, { orderId: string }>({
+      query: ({ ...body }) => ({
+        url: 'newebpay/checkout',
+        method: 'POST',
+        body
+      })
+    }),
+    getOrderById: builder.mutation<ApiRes<OrderByIdType>, { orderId: string }>({
+      query: ({ orderId }) => ({
+        url: `order/${orderId}`
+      })
+    }),
   })
 })
 
@@ -128,4 +140,6 @@ export const {
   useGetOrderTicketsMutation,
   usePostOrderSeatsMutation,
   usePostOrderCreateMutation,
+  usePostNewebpayCheckoutMutation,
+  useGetOrderByIdMutation,
 } = authApi

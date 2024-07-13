@@ -1,7 +1,7 @@
 import { SeatsType } from "./seatsType";
 
 export type OrderCreateParams = {
-  userName: string;
+  userId: string;
   sessionId: string;
   count: number;
   areaName: string;

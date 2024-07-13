@@ -4,6 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendarDays, faCouch } from '@fortawesome/free-solid-svg-icons'
 
+import { usePostNewebpayCheckoutMutation } from '@/store/authApi';
+import { NewebpayCheckout } from '@/types/purchase';
+
 // interface StepsProps {
 //   setCurrentStep: (step: number) => void;
 // }
@@ -13,9 +16,85 @@ const Step04 = () => {
   const orderId = params.get('orderId') || "";
   console.log('orderId:', orderId)
 
+  const [postNewebpayCheckout] = usePostNewebpayCheckoutMutation();
+  const [newebpayCheckout, setNewebpayCheckout] = useState<NewebpayCheckout | undefined>();
+
   const handleSubmit = () => {
-    console.log('go to 金流')
+
+    // console.log('go to 金流')
+    postNewebpay(orderId);
   }
+
+  const postNewebpay= async (orderId: string) => {
+    try {
+      const data = await postNewebpayCheckout({ orderId }).unwrap();
+      setNewebpayCheckout(data.data);
+    } catch (error) {
+      setNewebpayCheckout(undefined);
+      console.error('Failed to fetch seats:', error);
+    }
+  }
+
+  useEffect(() => {
+    if (!!newebpayCheckout) {
+      console.log('newebpayCheckout:', newebpayCheckout);
+      createAndSubmitForm(newebpayCheckout);
+    }
+}, [newebpayCheckout]);
+
+const createAndSubmitForm = (data: NewebpayCheckout) => {
+    const form = document.createElement("form");
+    form.method = "post";
+    form.action = data.PayGateWay;
+
+    const addField = (name: any, value: any) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    };
+
+    addField("MerchantID", data.MerchantID);
+    addField("TradeSha", data.TradeSha);
+    addField("TradeInfo", data.TradeInfo);
+    addField("TimeStamp", data.TimeStamp);
+    addField("Version", data.Version);
+    addField("NotifyUrl", data.NotifyUrl);
+    addField("ReturnUrl", data.ReturnUrl);
+    addField("MerchantOrderNo", data.MerchantOrderNo);
+    addField("Amt", data.Amt);
+    addField("ItemDesc", data.ItemDesc);
+    addField("Email", data.Email);
+
+    document.body.appendChild(form);
+    form.submit();
+};
+
+// <!DOCTYPE html>
+// <html>
+//   <head>
+//     <title>Pay</title>
+//   </head>
+//   <body>
+//     <div id="app">
+//       <form action="<%- PayGateWay %>" method="post">
+//         <input type="text" name="MerchantID" value="<%- MerchantID %>" />
+//         <input type="text" name="TradeSha" value="<%- ShaEncrypt %>" />
+//         <input type="text" name="TradeInfo" value="<%- AesEncrypt %>" />
+//         <input type="text" name="TimeStamp" value="<%- TimeStamp %>" />
+//         <input type="text" name="Version" value="<%- Version %>" />
+//         <input type="text" name="NotifyUrl" value="<%- NotifyUrl %>" />
+//         <input type="text" name="ReturnUrl" value="<%- ReturnUrl %>" />
+//         <input type="text" name="MerchantOrderNo" value="<%- MerchantOrderNo %>" />
+//         <input type="text" name="Amt" value="<%- Amt %>" />
+//         <input type="text" name="ItemDesc" value="<%- ItemDesc %>" />
+//         <input type="email" name="Email" value="<%- Email %>" />
+//         <button type="submit">送出</button>
+//       </form>
+//     </div>
+//   </body>
+// </html>
 
   return (
     <div className='bg-background'>

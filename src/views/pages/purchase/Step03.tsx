@@ -46,7 +46,7 @@ const Step03 = ({
           </div>
           <div className='flex gap-4 items-center'>
             <FontAwesomeIcon icon={faCouch} className='w-5 h-5 text-brand-01' />
-            <p className="fs-6">{`${areaInfo?.areaName} ${seatsInfo?.map(x => (` ${x.row}-${x.number}`))}`}</p>
+            <p className="fs-6">{`${areaInfo?.areaName} ${seatsInfo?.map(x => (`第 ${x.row} 排 － ${x.number}`))}`}</p>
           </div>
         </div>
         <div className='lg:mb-20 mb-8'>
@@ -98,13 +98,13 @@ const PaymentForm = ({
   const onSubmit: SubmitHandler<FormInput> = data => {
     console.log(data);
     const user = JSON.parse(localStorage.getItem("user") as string ?? "");
-    const userName = !!user ? user.email as string : "";
+    const userId = !!user ? user.id as string : "";
     const sessionId = router.query.sessionId as string || "";
     const { count, areaName } = areaInfo as AreaInfo;
     const seats = seatsInfo as SeatsInfo[];
 
     const orderCreateReq = {
-      userName,
+      userId,
       sessionId,
       count,
       areaName,

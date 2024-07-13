@@ -67,7 +67,6 @@ const Banner = ({ orderTicket }: Props) => {
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {/* TODO: Image URL src={orderTicket.eventImages} */}
       <Image src={orderTicket.eventImages} alt="event info" width="0" height="0" sizes="100vw" className='col-span-3 lg:col-span-1 w-full h-auto' priority />
       <div className='col-span-3 lg:col-span-2 py-3 text-gray-02'>
         <h3 className="h3 font-bold text-gray-01 text-[24px] lg:text-[28px] mb-4 lg:mb-6">{orderTicket.eventName}</h3>
