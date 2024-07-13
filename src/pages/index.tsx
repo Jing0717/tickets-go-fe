@@ -171,8 +171,8 @@ export default function Home() {
             <span className='ml-2 border-b-2 border-red-500 w-20'></span>
           </div>
           <div className='flex space-x-6 justify-between'>
-            {events.map((event: { id: string; name: string }) => (
-              <Card key={event.id} id={event.id} img={'/image14.jpg'} title={event.name} />
+            {events.map((event: { id: string; name: string, sessions: { startDate: number}[] }) => (
+              <Card key={event.id} id={event.id} img={'/image14.jpg'} title={event.name} startDate={event.sessions[0].startDate} />
             ))}
           </div>
         </div>

@@ -8,6 +8,9 @@ import Spinner from '@/components/Spinner'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFire, faThumbsUp, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
+import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
+
 interface Order {
   id: string
   ticketName: string
@@ -23,7 +26,7 @@ interface Event {
   eventName: string
   eventContent: string
   tags: string[]
-  eventStartDate: string
+  eventStartDate: number
   eventEndDate: string
   introImage: string
   bannerImage: string
@@ -35,6 +38,8 @@ interface OrderWithEvent {
 }
 
 const UserOrders: React.FC = () => {
+  dayjs.locale('zh-cn');
+
   const [getUserOrders] = useGetUserOrdersMutation()
 
   // upcoming: 即將到來; finished: 已結束
@@ -164,7 +169,8 @@ const UserOrders: React.FC = () => {
                 </div>
                 <div className='flex justify-between mb-3'>
                   <span className='text-[#4A4A4A] text-base tracking-wider'>
-                    {event?.eventStartDate}
+                    {dayjs(+(event?.eventStartDate || 0)).format('YYYY/MM/DD(dd) HH:mm(Z)')}
+                    {}
                     {/*  ? formatDate(new Date(event.eventStartDate)) : '' */}
                   </span>
                 </div>
