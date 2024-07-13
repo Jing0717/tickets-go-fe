@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
@@ -8,21 +8,30 @@ import Image from 'next/image'
 
 const UserProfile: React.FC = () => {
   const router = useRouter()
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      const parsedUser = JSON.parse(user)
+      setUserName(parsedUser.name)
+    }
+  }, [])
 
   const handleNavigation = (path: string) => {
     router.push(path)
   }
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen)
   }
 
   const handleLogout = () => {
-    dispatch(clearToken());
-  };
+    dispatch(clearToken())
+  }
 
   return (
     <div className='relative z-20'>
@@ -30,7 +39,7 @@ const UserProfile: React.FC = () => {
         <div className='relative w-8 h-8'>
           <Image src='/avatar.jpeg' alt='Avatar' layout='fill' className='rounded-full object-cover' />
         </div>
-        <span className='font-noto-sans-tc'>Jacky</span>
+        <span className='font-noto-sans-tc'>{userName}</span>
         <FontAwesomeIcon icon={isDropdownOpen ? faAngleUp : faAngleDown} className='w-6 h-6' />
       </button>
       {isDropdownOpen && (
