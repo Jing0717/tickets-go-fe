@@ -2,10 +2,12 @@ import requireAuth from '@/components/RequireAuth'
 import { useGetEventContentQuery } from '@/store/homeApi'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { format } from 'date-fns'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalendar } from '@fortawesome/free-regular-svg-icons'
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons'
+
+import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
 
 interface Session {
   sessionId: string;
@@ -19,6 +21,8 @@ interface Session {
 const EventPage = () => {
   const router = useRouter()
   const { eventId } = router.query
+
+  dayjs.locale('zh-cn');
 
   const { data, error, isLoading } = useGetEventContentQuery(eventId as string);
 
@@ -43,7 +47,9 @@ const EventPage = () => {
       <div className='container mt-[520px]'>
         <h1 className='text-4xl font-bold mb-4'>{event.name}</h1>
         <div className='text-lg mb-4 font-noto-sans-tc'>
-          <p><FontAwesomeIcon icon={faCalendar} className='text-brand-01 pr-4' />{format(new Date(event.sessions[0].startDate), 'yyyy/MM/dd(E) HH:mm')}</p>
+          <p><FontAwesomeIcon icon={faCalendar} className='text-brand-01 pr-4' />
+          {dayjs(+event.sessions[0].startDate).format('YYYY/MM/DD(dd) HH:mm(Z)')}
+          </p>
           <p><FontAwesomeIcon icon={faLocationDot} className='text-brand-01 pr-4' />{event.sessions[0].location}</p>
         </div>
         <div className='border-t mt-8'>
@@ -61,11 +67,11 @@ const EventPage = () => {
 
           <div className='mt-4'>
             <h2 id='introduction' className='text-2xl font-bold mb-2'>簡介</h2>
-            <p className='mb-4'>{event.description}</p>
+            <p className='mb-4' dangerouslySetInnerHTML={{ __html: event.description}}></p>
             <h2 id='programInfo' className='text-2xl font-bold mb-2'>節目資訊</h2>
             <p className='mb-4'>
               活動名稱：{event.name}<br />
-              活動日期：{format(new Date(event.sessions[0].startDate), 'yyyy/MM/dd(E) HH:mm')}<br />
+              活動日期：{dayjs(+event.sessions[0].startDate).format('YYYY/MM/DD(dd) HH:mm(Z)')}<br />
               活動地點：{event.sessions[0].location}<br />
             </p>
           </div>
@@ -263,10 +269,16 @@ const EventPage = () => {
                     router.push(`/purchase?eventId=${eventId}&sessionId=${ticket.sessionId}`);
                   }}>
                     <div className='py-2 px-4 grid' style={{ gridTemplateColumns: '600px 200px 150px 150px' }}>
-                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.startDate}</div>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>
+                        {dayjs(+ticket.startDate).format('YYYY/MM/DD(dd) HH:mm(Z)')}
+                        </div>
                       <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.location}</div>
-                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.startTime}</div>
-                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>{ticket.endTime}</div>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>
+                        {dayjs(+ticket.startTime).format('HH:mm')}
+                        </div>
+                      <div className='whitespace-nowrap overflow-hidden text-ellipsis'>
+                        {dayjs(+ticket.endTime).format('HH:mm')}
+                        </div>
                     </div>
                   </div>
                 ))}

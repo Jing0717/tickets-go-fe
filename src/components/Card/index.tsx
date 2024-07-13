@@ -42,10 +42,10 @@ const Card: React.FC<CardProps> = ({ img, title, id, isMobileLayout = false }) =
           <h2 className='text-lg font-semibold mb-2'>{title}</h2>
           <div className='text-gray-500 mb-2'>
             <div>
-              <span>2025/02/30</span>
-              <span className='mx-2'>17:30</span>
+              <span>2024/07/15</span>
+              <span className="mx-2">17:30</span>
             </div>
-            <div>TAIWAN</div>
+            <div>台北小巨蛋</div>
           </div>
         </div>
       </div>
