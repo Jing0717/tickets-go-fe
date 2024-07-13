@@ -25,28 +25,28 @@ const Purchase = () => {
   const [orderTicket, setOrderTickets] = useState<OrderTicketsType | undefined>();
   const [areaInfo, setAreaInfo] = useState<AreaInfo | undefined>();
   const [seatsInfo, setSeatsInfo] = useState<SeatsInfo[] | undefined>();
+  const [orderId, setOrderId] = useState<string>();
+
 
   useEffect(() => {
-    const step = router.query.step as string || "";
-    const orderId = router.query.orderId as string || "";
+  if (!router.isReady) return;
 
-    const addOrderId = (step: string, orderId: string) => {
-      const newParams = { ...router.query, step, orderId };
-      updateQueryParams(newParams);
-    };
+    const { step, ...restParams } = router.query;
+    console.log('Removing step param, current step:', step);
 
-    const updateQueryParams = (newParams: any) => {
-      router.replace({
-        pathname: router.pathname,
-        query: { ...router.query, ...newParams }
-      }, undefined, { shallow: true });
-    };
+    const { orderId } = router.query;
 
     if (step === '4') {
-      addOrderId(step, orderId);
-      setCurrentStep(4)
+      setCurrentStep(4);
+      setOrderId(orderId as string);
+      console.log('orderId:', orderId)
+      router.replace({
+        pathname: router.pathname,
+        query: restParams
+      }, undefined, { shallow: true });
     }
-  },[router, router.query, setCurrentStep]);
+  }, [router, router.isReady, setCurrentStep]);
+
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -91,7 +91,9 @@ const Purchase = () => {
           setAreaInfo={setAreaInfo}
           seatsInfo={seatsInfo}
           setSeatsInfo={setSeatsInfo}
+          orderId={orderId}
         /> }
+        { orderId && <CompletedStep orderId={orderId} /> }
     </>
   )
 }
@@ -104,6 +106,7 @@ interface StepsContentrProps {
   setAreaInfo: (areaInfo: AreaInfo | undefined) => void;
   seatsInfo: SeatsInfo[] | undefined;
   setSeatsInfo: (seatsInfo: SeatsInfo[] | undefined) => void;
+  orderId: string | undefined;
 }
 
   const StepsContent = ({
@@ -113,8 +116,10 @@ interface StepsContentrProps {
     areaInfo,
     setAreaInfo,
     seatsInfo,
-    setSeatsInfo
+    setSeatsInfo,
+    orderId,
   }: StepsContentrProps) => {
+    console.log('orderId:', orderId)
     switch (currentStep) {
       case 0:
         return <Step01
@@ -138,12 +143,18 @@ interface StepsContentrProps {
                 />;
       case 3:
         return <Step04 />;
-      case 4:
-        return <Step05 />;
+
       default:
         return <div>未知步驟</div>;
     }
   };
+
+  interface CompletedStepProps {
+    orderId: string | undefined;
+  }
+  const CompletedStep = ({ orderId }: CompletedStepProps) => {
+    return (!!orderId && <Step05 orderId={orderId} />);
+  }
 
 
 export default Purchase

@@ -1,4 +1,4 @@
-import { SeatsType } from './seatsType'
+import { OrderCreateSeatType } from './orderCreateType'
 
 export type OrderByIdType = {
   orderId: string,
@@ -10,5 +10,5 @@ export type OrderByIdType = {
   sessionStartTime: string,
   sessionEndTime: string,
   sessionPlace: string,
-  seats: SeatsType[]
+  seats: OrderCreateSeatType[]
 }
