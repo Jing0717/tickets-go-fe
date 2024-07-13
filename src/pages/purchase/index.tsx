@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/router';
 
 import { useGetOrderTicketsMutation } from '@/store/authApi'
 import { OrderTicketsType } from "@/types/purchase"
@@ -18,13 +18,35 @@ const Purchase = () => {
   ];
   const [currentStep, setCurrentStep] = useState<number>(0);
 
-  const params = useSearchParams();
-  const eventId = params.get('eventId') || "";
-  const sessionId = params.get('sessionId') || "";
+  const router = useRouter();
+  const eventId = router.query.eventId as string || "";
+  const sessionId = router.query.sessionId as string || "";
   const [getOrderTickets] = useGetOrderTicketsMutation();
   const [orderTicket, setOrderTickets] = useState<OrderTicketsType | undefined>();
   const [areaInfo, setAreaInfo] = useState<AreaInfo | undefined>();
   const [seatsInfo, setSeatsInfo] = useState<SeatsInfo[] | undefined>();
+
+  useEffect(() => {
+    const step = router.query.step as string || "";
+    const orderId = router.query.orderId as string || "";
+
+    const addOrderId = (step: string, orderId: string) => {
+      const newParams = { ...router.query, step, orderId };
+      updateQueryParams(newParams);
+    };
+
+    const updateQueryParams = (newParams: any) => {
+      router.replace({
+        pathname: router.pathname,
+        query: { ...router.query, ...newParams }
+      }, undefined, { shallow: true });
+    };
+
+    if (step === '4') {
+      addOrderId(step, orderId);
+      setCurrentStep(4)
+    }
+  },[router, router.query, setCurrentStep]);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -50,6 +72,8 @@ const Purchase = () => {
       console.log('orderTicket:', orderTicket)
     }
   },[orderTicket])
+
+
 
   return (
     <>
