@@ -7,12 +7,19 @@ import { faCalendarDays, faCouch } from '@fortawesome/free-solid-svg-icons'
 import { useGetOrderByIdMutation } from '@/store/authApi';
 import { OrderByIdType } from '@/types/purchase';
 
+import dayjs from "dayjs";
+import 'dayjs/locale/zh-cn';
+
 interface TicketCardProps {
   areaName: string
   ticket: OrderByIdType
 }
 
-const TicketCard = ({ areaName, ticket }: TicketCardProps) => (
+const TicketCard = ({ areaName, ticket }: TicketCardProps) => {
+  dayjs.locale('zh-cn');
+  const eventDate = dayjs(+ticket.sessionStartDate * 1000).format('YYYY/MM/DD(dd) HH:mm(Z)');
+
+  return(
   <div className='flex flex-col md:flex-row items-center mb-4'>
     <div className='flex-none w-full md:w-48 h-[152px] relative'>
       <img
@@ -26,45 +33,45 @@ const TicketCard = ({ areaName, ticket }: TicketCardProps) => (
       <h2 className='text-xl text-[#1E1E1E] font-medium mb-5'>{ticket.sessionName}</h2>
       <div className='flex mb-3'>
         <FontAwesomeIcon icon={faCalendarDays} className='w-6 h-6 text-[#DC4B4B] me-4' />
-        <span className='text-base'>{ticket.sessionStartDate}</span>
+        <span className='text-base'>{eventDate}</span>
       </div>
       {ticket.seats.map((seat, index) => (
         <div key={index} className='flex'>
           <FontAwesomeIcon icon={faCouch} className='w-6 h-6 text-[#DC4B4B] me-4' />
           <span className='text-base'>
-           {areaName}  第 {seat.row} 排 － {seat.number}
+           {areaName}  第 {seat.seatRow} 排 － {seat.seatNumber}
           </span>
         </div>
       ))}
     </div>
   </div>
-)
+)}
 
-const Step05 = () => {
+interface StepsProps {
+  orderId: string | undefined;
+}
+
+const Step05 = ({ orderId }: StepsProps) => {
   const router = useRouter();
 
   const [getOrderById] = useGetOrderByIdMutation();
   const [orderInfo, setOrderInfo] = useState<OrderByIdType | undefined>();
 
-  useEffect(()=>{
-    const orderId = router.query.orderId as string || "";
-
+  useEffect(() => {
     const getOrderIdInfo = async (orderId: string) => {
       try {
-        const data = await getOrderById({orderId}).unwrap();
+        const data = await getOrderById({ orderId },).unwrap();
         setOrderInfo(data.data);
       } catch (error) {
-
         setOrderInfo(undefined);
-        console.error('Failed to fetch seats:', error);
+        console.error('Failed to fetch order:', error);
       }
     }
 
-    if (!!orderId) {
-      getOrderIdInfo(orderId)
+    if(!!orderId) {
+      getOrderIdInfo(orderId);
     }
-
-  },[getOrderById, router, router.query]);
+  }, [orderId, getOrderById]);
 
   useEffect(() => {
     if(!!orderInfo){
@@ -80,7 +87,7 @@ const Step05 = () => {
     router.push('/');
   };
 
-  return(
+  return (
     <div className='bg-[#FFFBF5] w-full flex flex-col justify-start items-center pb-10 px-4 flex-grow'>
       <h1 className='text-2xl font-bold mb-6'>您已完成訂購！</h1>
       <div className='bg-[#DC4B4B1A] p-6 mb-10 rounded-full'>
